@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="launcher_week_text_size">16sp</dimen>
+    <dimen name="launcher_time_layout_min_height">160dp</dimen>
+    <dimen name="launcher_text_clock_text_size">40sp</dimen>
+    <dimen name="launcher_time_padding">40dp</dimen>
+</resources>
