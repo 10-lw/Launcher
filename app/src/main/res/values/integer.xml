@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="launcher_first_page_app_counts">12</integer>
+</resources>

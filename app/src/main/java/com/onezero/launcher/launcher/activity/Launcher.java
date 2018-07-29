@@ -3,6 +3,7 @@ package com.onezero.launcher.launcher.activity;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.LauncherPageAdapter;
@@ -18,7 +19,6 @@ public class Launcher extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
-
         initViews();
     }
 
@@ -29,10 +29,10 @@ public class Launcher extends AppCompatActivity {
     }
 
     private void initPageView() {
-        pageAdapter = new LauncherPageAdapter(getSupportFragmentManager());
-        pageAdapter.setFragments(FragmentHelper.getFragmentList());
+        pageAdapter = new LauncherPageAdapter(getSupportFragmentManager(), FragmentHelper.getFragmentList(this));
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(pageAdapter);
+        viewPager.setCurrentItem(0);
     }
 
     private void initViews() {

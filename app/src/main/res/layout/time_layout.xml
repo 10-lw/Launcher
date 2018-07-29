@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:minHeight="@dimen/launcher_time_layout_min_height"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/launcher_time_padding"
+    android:paddingTop="@dimen/launcher_time_padding_top"
+    android:gravity="center_vertical"
+    android:paddingBottom="@dimen/launcher_time_padding_top"
+    android:background="@color/colorAccent"
     android:orientation="horizontal">
 
     <TextClock
         android:layout_width="0dp"
         android:textSize="@dimen/launcher_text_clock_text_size"
+        android:textColor="@android:color/white"
         android:layout_height="match_parent"
         android:layout_weight="3" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2"
+        android:layout_weight="3"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/launcher_week_text"
             android:text="周末"
+            android:textColor="@android:color/white"
             android:layout_gravity="center_horizontal"
             android:textSize="@dimen/launcher_week_text_size"
             android:layout_width="match_parent"
@@ -28,6 +34,7 @@
         <TextView
             android:text="03 29"
             android:id="@+id/launcher_date_text"
+            android:textColor="@android:color/white"
             android:textSize="@dimen/launcher_week_text_size"
             android:layout_gravity="center_horizontal"
             android:layout_width="match_parent"

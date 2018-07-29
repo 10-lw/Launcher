@@ -3,6 +3,7 @@ package com.onezero.launcher.launcher.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
 import java.util.List;
 
@@ -13,17 +14,19 @@ import java.util.List;
 public class LauncherPageAdapter extends FragmentPagerAdapter {
     private List<Fragment> list;
 
-    public LauncherPageAdapter(FragmentManager fm) {
+    public LauncherPageAdapter(FragmentManager fm, List<Fragment> list) {
         super(fm);
-    }
-
-    public void setFragments(List<Fragment> list){
         this.list = list;
     }
 
     @Override
     public Fragment getItem(int position) {
         return list.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
