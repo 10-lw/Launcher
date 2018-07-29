@@ -40,6 +40,7 @@ ext {
     logginginterceptor = '3.9.1'
     rxjavaVersion = '2.1.11'
     rxandroidVersion = "2.0.2"
+    eventBusVersion = "3.0.0"
 }
 
 dependencies {
@@ -57,4 +58,5 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "org.greenrobot:eventbus:$eventBusVersion"
 }

@@ -20,7 +20,6 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
 
     public LauncherRecyclerViewAdapter(Context context, List<AppInfo> list) {
         this.list = list;
-        Log.d("tag", "=====LauncherRecyclerViewAdapter======" + list.size());
         this.mContext = context;
     }
 

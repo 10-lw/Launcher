@@ -44,12 +44,10 @@ public class AppInfoUtils {
 
             String activityName = info.activityInfo.name;
             String packageName = info.activityInfo.packageName;
-            ComponentName componentName = new ComponentName(packageName, activityName);
-            intent.setComponent(componentName);
-            appInfo.setIntent(intent);
+            appInfo.setIntent(pm.getLaunchIntentForPackage(packageName));
 
             appInfo.setAppLabel((String) info.loadLabel(pm));
-            appInfo.setPkgName(info.activityInfo.packageName);
+            appInfo.setPkgName(packageName);
 
             appInfos.add(appInfo);
         }

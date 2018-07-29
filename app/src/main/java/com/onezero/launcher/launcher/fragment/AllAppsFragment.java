@@ -9,6 +9,10 @@ import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.LauncherRecyclerViewAdapter;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
+import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
+import com.onezero.launcher.launcher.event.OnAppItemLongClickEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -37,12 +41,12 @@ public class AllAppsFragment extends BaseAppFragment {
         adapter.setOnClickListener(new RecyclerViewClickListener() {
             @Override
             public void OnItemClick(AppInfo info) {
-
+                EventBus.getDefault().post(new OnAppItemClickEvent(info));
             }
 
             @Override
             public void OnLongClick(AppInfo info) {
-
+                EventBus.getDefault().post(new OnAppItemLongClickEvent(info));
             }
         });
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
@@ -52,7 +56,6 @@ public class AllAppsFragment extends BaseAppFragment {
     @Override
     public void setAppInfos(List<AppInfo> list) {
         this.list = list;
-        Log.d("tag", "===all apps size=="+list.size());
     }
 
     @Override

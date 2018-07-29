@@ -15,9 +15,13 @@ import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.LauncherRecyclerViewAdapter;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
+import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
+import com.onezero.launcher.launcher.event.OnAppItemLongClickEvent;
 import com.onezero.launcher.launcher.presenter.LauncherPresenter;
 import com.onezero.launcher.launcher.utils.StringUtils;
 import com.onezero.launcher.launcher.view.ITimeView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -57,12 +61,12 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
         adapter.setOnClickListener(new RecyclerViewClickListener() {
             @Override
             public void OnItemClick(AppInfo info) {
-                Log.d("tag", "====OnItemClick==="+info.getAppLabel());
+                EventBus.getDefault().post(new OnAppItemClickEvent(info));
             }
 
             @Override
             public void OnLongClick(AppInfo info) {
-                Log.d("tag", "====OnLongClick==="+info.getAppLabel());
+                EventBus.getDefault().post(new OnAppItemLongClickEvent(info));
             }
         });
         firstRecyclerView.setAdapter(adapter);
@@ -73,17 +77,25 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
     public void onResume() {
         super.onResume();
         presenter.updateTime();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         initReceiver();
     }
 
     private void initReceiver() {
         if (dateReceiver == null) {
             dateReceiver = new DateReceiver(presenter);
+        }
+
+        if (filter == null) {
             filter = new IntentFilter();
             filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
             filter.addAction(Intent.ACTION_DATE_CHANGED);
         }
-        getActivity().registerReceiver(dateReceiver, filter);
+        getContext().registerReceiver(dateReceiver, filter);
     }
 
     @Override
@@ -105,7 +117,6 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
     @Override
     public void setAppInfos(List<AppInfo> list) {
         this.list = list;
-        Log.d("tag", "======app info  date apps=="+list.size());
     }
 
     @Override
