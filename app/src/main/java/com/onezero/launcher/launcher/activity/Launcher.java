@@ -4,12 +4,14 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.LauncherPageAdapter;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
-import com.onezero.launcher.launcher.event.OnAppItemLongClickEvent;
+import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
+import com.onezero.launcher.launcher.event.OnLauncherToucheEvent;
 import com.onezero.launcher.launcher.utils.FragmentHelper;
 
 import org.greenrobot.eventbus.EventBus;
@@ -21,6 +23,7 @@ public class Launcher extends AppCompatActivity {
     private ViewPager viewPager;
     private LauncherPageAdapter pageAdapter;
     private int currentPosition;
+    private boolean removeIconEnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +76,18 @@ public class Launcher extends AppCompatActivity {
 
     @Subscribe
     public void onItemClick(OnAppItemClickEvent event) {
-        Log.d("tag", "===click package name====="+event.getInfo().getPkgName());
         ApplicationHelper.performStartApp(this, event.getInfo());
     }
 
     @Subscribe
-    public void onItemClick(OnAppItemLongClickEvent event) {
-        Log.d("tag", "===long click package name====="+event.getInfo().getPkgName());
+    public void onItemRemoveClick(OnAppItemRemoveClickEvent event) {
+        Log.d("tag", "===long click package name===？？？？？==" + event.getInfo().getPkgName());
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        EventBus.getDefault().post(new OnLauncherToucheEvent());
+        Log.d("tag", "=======onTouchEvent===onTouchEvent======");
+        return true;
     }
 }

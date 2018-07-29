@@ -48,6 +48,12 @@ public class AppInfoUtils {
 
             appInfo.setAppLabel((String) info.loadLabel(pm));
             appInfo.setPkgName(packageName);
+            try {
+                boolean isSystemApp = ApplicationHelper.isSystemApp(pm.getPackageInfo(packageName, 0));
+                appInfo.setSystemApp(isSystemApp);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
 
             appInfos.add(appInfo);
         }

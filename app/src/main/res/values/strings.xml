@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Launcher</string>
+    <string name="can_not_remove_system_app">System application can\'t be removed.</string>
 </resources>

@@ -5,6 +5,7 @@
     android:background="@color/colorAccent">
 
     <android.support.v7.widget.RecyclerView
+        android:clickable="true"
         android:id="@+id/launcher_apps_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

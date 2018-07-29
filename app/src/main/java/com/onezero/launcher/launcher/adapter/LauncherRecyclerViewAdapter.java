@@ -2,10 +2,10 @@ package com.onezero.launcher.launcher.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
@@ -34,30 +34,54 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
     }
 
     @Override
-    public void onBindViewHolder(AppInfoViewHolder holder, int position) {
+    public void onBindViewHolder(final AppInfoViewHolder holder, int position) {
         final AppInfo appInfo = list.get(position);
+        final boolean isSystemApp = appInfo.isSystemApp();
         holder.icon.setImageDrawable(appInfo.getAppIconId());
         holder.label.setText(appInfo.getAppLabel());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.OnItemClick(appInfo);
+                resetRemoveIcon();
+                listener.onItemClick(appInfo);
             }
         });
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                listener.OnLongClick(appInfo);
+                if (isSystemApp) {
+                    Toast.makeText(mContext, R.string.can_not_remove_system_app, Toast.LENGTH_LONG).show();
+                    return true;
+                }
+                appInfo.setRemoveable(true);
+                notifyDataSetChanged();
                 return true;
             }
         });
+        boolean visible = !isSystemApp && appInfo.isRemoveable();
+        holder.removeIcon.setVisibility(visible ? View.VISIBLE : View.GONE);
+        holder.removeIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onRemoveClick(appInfo);
+                appInfo.setRemoveable(false);
+                notifyDataSetChanged();
+            }
+        });
+
+    }
+
+    private void resetRemoveIcon() {
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).setRemoveable(false);
+            notifyDataSetChanged();
+        }
     }
 
     @Override
     public int getItemCount() {
-        Log.d("tag", "=====getItemCount======" + list.size());
         return list == null ? 0 : list.size();
     }
 }

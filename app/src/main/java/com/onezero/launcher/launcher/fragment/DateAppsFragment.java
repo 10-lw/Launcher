@@ -3,10 +3,7 @@ package com.onezero.launcher.launcher.fragment;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,7 +13,7 @@ import com.onezero.launcher.launcher.adapter.LauncherRecyclerViewAdapter;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
-import com.onezero.launcher.launcher.event.OnAppItemLongClickEvent;
+import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.presenter.LauncherPresenter;
 import com.onezero.launcher.launcher.utils.StringUtils;
 import com.onezero.launcher.launcher.view.ITimeView;
@@ -60,13 +57,13 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
         firstRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         adapter.setOnClickListener(new RecyclerViewClickListener() {
             @Override
-            public void OnItemClick(AppInfo info) {
+            public void onItemClick(AppInfo info) {
                 EventBus.getDefault().post(new OnAppItemClickEvent(info));
             }
 
             @Override
-            public void OnLongClick(AppInfo info) {
-                EventBus.getDefault().post(new OnAppItemLongClickEvent(info));
+            public void onRemoveClick(AppInfo info) {
+                EventBus.getDefault().post(new OnAppItemRemoveClickEvent(info));
             }
         });
         firstRecyclerView.setAdapter(adapter);

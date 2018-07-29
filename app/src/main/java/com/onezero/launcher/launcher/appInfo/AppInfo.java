@@ -12,6 +12,8 @@ public class AppInfo {
     private Drawable appIconId ;  //应用程序图像
     private Intent intent ;     //启动应用程序的Intent ，一般是Action为Main和Category为Lancher的Activity
     private String pkgName ;    //应用程序所对应的包名
+    private boolean isSystemApp;
+    private boolean removeable;
 
     public String getAppLabel() {
         return appLabel;
@@ -46,7 +48,23 @@ public class AppInfo {
         this.appIconId = appIconId;
     }
 
+    public boolean isSystemApp() {
+        return isSystemApp;
+    }
+
+    public void setSystemApp(boolean systemApp) {
+        isSystemApp = systemApp;
+    }
+
     public AppInfo() {
+    }
+
+    public boolean isRemoveable() {
+        return removeable;
+    }
+
+    public void setRemoveable(boolean removeable) {
+        this.removeable = removeable;
     }
 
     public AppInfo(String appLabel, Drawable appIconId, Intent intent, String pkgName) {

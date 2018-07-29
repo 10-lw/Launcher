@@ -2,7 +2,7 @@ package com.onezero.launcher.launcher.event;
 
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 
-public class OnAppItemLongClickEvent {
+public class OnAppItemRemoveClickEvent {
     private AppInfo info;
 
     public AppInfo getInfo() {
@@ -13,7 +13,7 @@ public class OnAppItemLongClickEvent {
         this.info = info;
     }
 
-    public OnAppItemLongClickEvent(AppInfo info) {
+    public OnAppItemRemoveClickEvent(AppInfo info) {
         this.info = info;
     }
 }
