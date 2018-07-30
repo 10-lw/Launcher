@@ -1,5 +1,7 @@
 package com.onezero.launcher.launcher.activity;
 
+import android.app.WallpaperManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -23,12 +25,13 @@ public class Launcher extends AppCompatActivity {
     private ViewPager viewPager;
     private LauncherPageAdapter pageAdapter;
     private int currentPosition;
-    private boolean removeIconEnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
+        Drawable wallPaper = WallpaperManager.getInstance( this).getDrawable();
+        this.getWindow().setBackgroundDrawable(wallPaper);
         initViews();
     }
 

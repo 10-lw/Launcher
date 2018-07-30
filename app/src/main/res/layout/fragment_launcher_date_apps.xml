@@ -12,7 +12,6 @@
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/black"
         android:id="@+id/launcher_first_page_recycler_view"
         android:layout_gravity="bottom"/>
 </LinearLayout>

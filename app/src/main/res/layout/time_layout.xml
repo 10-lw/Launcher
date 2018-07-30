@@ -6,7 +6,6 @@
     android:paddingTop="@dimen/launcher_time_padding_top"
     android:gravity="center_vertical"
     android:paddingBottom="@dimen/launcher_time_padding_top"
-    android:background="@color/colorAccent"
     android:orientation="horizontal">
 
     <TextClock
