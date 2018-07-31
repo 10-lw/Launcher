@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="launcher_first_page_app_counts">12</integer>
-    <integer name="launcher_per_page_app_max_counts">28</integer>
 </resources>

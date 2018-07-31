@@ -8,30 +8,56 @@ import android.util.Log;
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
+import com.onezero.launcher.launcher.callback.CalculateCallBack;
+import com.onezero.launcher.launcher.callback.QueryCallBack;
 import com.onezero.launcher.launcher.fragment.AllAppsFragment;
 import com.onezero.launcher.launcher.fragment.DateAppsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by lizeiwei on 2018/7/28.
  */
 
 public class FragmentHelper {
-    public static List<Fragment> fragments = new ArrayList<>();
 
-    public static List<Fragment> getFragmentList(Activity context) {
-        fragments.clear();
-        List<AppInfo> appInfos = AppInfoUtils.queryAllAppInfo(context.getPackageManager());
+    public static void getFragmentList(final Activity context, final CalculateCallBack calculateCallBack) {
+        AppInfoUtils.queryAllAppInfoTask(context.getPackageManager(), new QueryCallBack() {
+            @Override
+            public void querySuccessful(final List<AppInfo> list) {
+                Observable.create(new ObservableOnSubscribe<List<Fragment>>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<List<Fragment>> emitter) throws Exception {
+                        emitter.onNext(calculateFragments(context, list));
+                    }
+                }).subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<List<Fragment>>() {
+                            @Override
+                            public void accept(List<Fragment> fragments) throws Exception {
+                                calculateCallBack.calculateSuccessful(fragments);
+                            }
+                        });
+            }
+        });
+    }
+
+    private static List<Fragment> calculateFragments(Activity context, List<AppInfo> appInfos) {
+        List<Fragment> fragments = new ArrayList<>();
         int size = appInfos.size();
-        Log.d("tag", "=========app size====:::::"+size);
         int firstPageAppCount = context.getResources().getInteger(R.integer.launcher_first_page_app_counts);
         int perPageMaxAppCount = context.getResources().getInteger(R.integer.launcher_per_page_app_max_counts);
         if (size > 0) {
             DateAppsFragment dateAppsFragment = new DateAppsFragment();
             int toIndex = Math.min(size - 1, firstPageAppCount);
-//            List<AppInfo> list = appInfos.subList(0, toIndex);
             List<AppInfo> firstPage = new ArrayList<>();
             for (int i = 0; i < toIndex - 0; i++) {
                 firstPage.add(appInfos.get(i));
@@ -55,8 +81,14 @@ public class FragmentHelper {
                 fragments.add(allAppsFragment);
             }
         }
-
         return fragments;
     }
 
+
+    public static List<AppInfo> resetRemoveIcon(List<AppInfo> list) {
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).setRemoveable(false);
+        }
+        return list;
+    }
 }

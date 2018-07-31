@@ -14,6 +14,7 @@ import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.event.OnLauncherToucheEvent;
+import com.onezero.launcher.launcher.utils.FragmentHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -42,7 +43,7 @@ public class AllAppsFragment extends BaseAppFragment {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void initData() {
-        LauncherRecyclerViewAdapter adapter = new LauncherRecyclerViewAdapter(getContext(), list);
+        final LauncherRecyclerViewAdapter adapter = new LauncherRecyclerViewAdapter(getContext(), list);
         adapter.setOnClickListener(new RecyclerViewClickListener() {
             @Override
             public void onItemClick(AppInfo info) {
@@ -59,8 +60,12 @@ public class AllAppsFragment extends BaseAppFragment {
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                Log.d("tag", "====fuck=========");
-                return false;
+                int action = motionEvent.getAction();
+                if (action == MotionEvent.ACTION_DOWN) {
+                    FragmentHelper.resetRemoveIcon(list);
+                    adapter.notifyDataSetChanged();
+                }
+                return true;
             }
         });
     }

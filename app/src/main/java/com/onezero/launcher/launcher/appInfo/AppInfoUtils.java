@@ -1,19 +1,22 @@
 package com.onezero.launcher.launcher.appInfo;
 
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
+
+import com.onezero.launcher.launcher.callback.QueryCallBack;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by lizeiwei on 2018/7/28.
@@ -21,9 +24,29 @@ import java.util.List;
 
 public class AppInfoUtils {
 
-    private static ArrayList<AppInfo> appInfos;
+    private static List<AppInfo> appInfos;
 
-    public static ArrayList<AppInfo> queryAllAppInfo(PackageManager pm) {
+    public static void queryAllAppInfoTask(final PackageManager pm, final QueryCallBack callBack) {
+        Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
+                List<AppInfo> list = queryAllAppInfo(pm);
+                if (list != null) {
+                    emitter.onNext(list);
+                } else {
+                    emitter.onNext(new ArrayList<AppInfo>());
+                }
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .subscribe(new Consumer<List<AppInfo>>() {
+                    @Override
+                    public void accept(List<AppInfo> list) throws Exception {
+                        callBack.querySuccessful(list);
+                    }
+                });
+    }
+
+    public static List<AppInfo> queryAllAppInfo(PackageManager pm) {
         if (appInfos == null) {
             appInfos = new ArrayList<>();
         }
@@ -32,7 +55,6 @@ public class AppInfoUtils {
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> resolveInfoList = pm.queryIntentActivities(mainIntent, 0);
         Collections.sort(resolveInfoList, new ResolveInfo.DisplayNameComparator(pm));
-        Intent intent = new Intent();
         for (ResolveInfo info : resolveInfoList) {
             AppInfo appInfo = new AppInfo();
             try {

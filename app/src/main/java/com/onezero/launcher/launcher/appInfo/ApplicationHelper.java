@@ -1,13 +1,28 @@
 package com.onezero.launcher.launcher.appInfo;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.util.Log;
 
+import com.onezero.launcher.launcher.R;
+
+import java.io.PrintWriter;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class ApplicationHelper {
     public static final String TAG = "ApplicationHelper";
-    public static void performStartApp(Context context, AppInfo info){
+    private static boolean result = false;
+
+    public static void performStartApp(Context context, AppInfo info) {
         startActivitySafely(context, info);
     }
 
@@ -15,20 +30,166 @@ public class ApplicationHelper {
         try {
             context.startActivity(info.getIntent());
         } catch (Exception e) {
-            Log.e(TAG, "start activity error,the intent is:"+info.getIntent().toString());
+            Log.e(TAG, "start activity error,the intent is:" + info.getIntent().toString());
             e.printStackTrace();
         }
     }
+
     public static boolean isSystemApp(PackageInfo pInfo) {
         //判断是否是系统软件
         return ((pInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
     }
+
     public static boolean isSystemUpdateApp(PackageInfo pInfo) {
         //判断是否是软件更新..
         return ((pInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0);
     }
+
     public static boolean isUserApp(PackageInfo pInfo) {
         //是否是系统软件或者是系统软件正在更新
         return (!isSystemApp(pInfo) && !isSystemUpdateApp(pInfo));
+    }
+
+    public static void performUninstallApp(Context context, AppInfo info) {
+        final String pkgName = info.getPkgName();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                .setMessage(R.string.remove_app_confirm)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        clientUninstallTask(pkgName);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null);
+        builder.create().show();
+    }
+
+    public static boolean clientInstallTask(final String apkPath) {
+        Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                boolean b = clientInstall(apkPath);
+                emitter.onNext(b);
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .subscribe(new Observer<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(Boolean b) {
+                        result = b;
+                        Log.d(TAG, "Client installed successful!");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        result = false;
+                        Log.e(TAG, "Client installed error!");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+        return result;
+    }
+
+    public static boolean clientUninstallTask(final String pkgName) {
+        Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                boolean b = clientUninstall(pkgName);
+                emitter.onNext(b);
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .subscribe(new Observer<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(Boolean b) {
+                        result = b;
+                        Log.d(TAG, "Client uninstalled successful!");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        result = false;
+                        Log.e(TAG, "Client uninstalled error!");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+        return result;
+    }
+
+
+    /**
+     * install client
+     */
+    private static boolean clientInstall(String apkPath) {
+        PrintWriter PrintWriter = null;
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec("su");
+            PrintWriter = new PrintWriter(process.getOutputStream());
+            PrintWriter.println("chmod 777 " + apkPath);
+            PrintWriter.println("export LD_LIBRARY_PATH=/vendor/lib:/system/lib");
+            PrintWriter.println("pm install -r " + apkPath);
+//          PrintWriter.println("exit");
+            PrintWriter.flush();
+            PrintWriter.close();
+            int value = process.waitFor();
+            return returnResult(value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * uninstall client
+     */
+    private static boolean clientUninstall(String packageName) {
+        PrintWriter PrintWriter = null;
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec("su");
+            PrintWriter = new PrintWriter(process.getOutputStream());
+            PrintWriter.println("LD_LIBRARY_PATH=/vendor/lib:/system/lib ");
+            PrintWriter.println("pm uninstall " + packageName);
+            PrintWriter.flush();
+            PrintWriter.close();
+            int value = process.waitFor();
+            return returnResult(value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
+        return false;
+    }
+
+    private static boolean returnResult(int value) {
+        // 代表成功
+        if (value == 0) {
+            return true;
+        } else if (value == 1) { // 失败
+            return false;
+        } else { // 未知情况
+            return false;
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.onezero.launcher.launcher.activity;
 import android.app.WallpaperManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.MotionEvent;
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.LauncherPageAdapter;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
+import com.onezero.launcher.launcher.callback.CalculateCallBack;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.event.OnLauncherToucheEvent;
@@ -18,6 +20,8 @@ import com.onezero.launcher.launcher.utils.FragmentHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.List;
 
 public class Launcher extends AppCompatActivity {
 
@@ -46,23 +50,12 @@ public class Launcher extends AppCompatActivity {
     }
 
     private void initPageView() {
-        pageAdapter = new LauncherPageAdapter(getSupportFragmentManager(), FragmentHelper.getFragmentList(this));
-        viewPager.setOffscreenPageLimit(2);
-        viewPager.setAdapter(pageAdapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        FragmentHelper.getFragmentList(this, new CalculateCallBack() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                currentPosition = position;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+            public void calculateSuccessful(List<Fragment> list) {
+                pageAdapter = new LauncherPageAdapter(getSupportFragmentManager(), list);
+                viewPager.setOffscreenPageLimit(2);
+                viewPager.setAdapter(pageAdapter);
             }
         });
     }
@@ -84,13 +77,6 @@ public class Launcher extends AppCompatActivity {
 
     @Subscribe
     public void onItemRemoveClick(OnAppItemRemoveClickEvent event) {
-        Log.d("tag", "===long click package name===？？？？？==" + event.getInfo().getPkgName());
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        EventBus.getDefault().post(new OnLauncherToucheEvent());
-        Log.d("tag", "=======onTouchEvent===onTouchEvent======");
-        return true;
+        ApplicationHelper.performUninstallApp(this, event.getInfo());
     }
 }

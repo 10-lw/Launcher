@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
+import com.onezero.launcher.launcher.utils.FragmentHelper;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
     }
 
     @Override
-    public void onBindViewHolder(final AppInfoViewHolder holder, int position) {
+    public void onBindViewHolder(final AppInfoViewHolder holder, final int position) {
         final AppInfo appInfo = list.get(position);
         final boolean isSystemApp = appInfo.isSystemApp();
         holder.icon.setImageDrawable(appInfo.getAppIconId());
@@ -43,8 +44,11 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                resetRemoveIcon();
-                listener.onItemClick(appInfo);
+                if (!appInfo.isRemoveable()) {
+                    listener.onItemClick(appInfo);
+                }
+                FragmentHelper.resetRemoveIcon(list);
+                notifyItemChanged(position);
             }
         });
 
@@ -56,7 +60,7 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
                     return true;
                 }
                 appInfo.setRemoveable(true);
-                notifyDataSetChanged();
+                notifyItemChanged(position);
                 return true;
             }
         });
@@ -67,18 +71,17 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
             public void onClick(View view) {
                 listener.onRemoveClick(appInfo);
                 appInfo.setRemoveable(false);
-                notifyDataSetChanged();
+                notifyItemChanged(position);
             }
         });
 
     }
 
-    private void resetRemoveIcon() {
-        for (int i = 0; i < list.size(); i++) {
-            list.get(i).setRemoveable(false);
-            notifyDataSetChanged();
-        }
-    }
+//    public static void resetRemoveIcon(List<AppInfo> list) {
+//        for (int i = 0; i < list.size(); i++) {
+//            list.get(i).setRemoveable(false);
+//        }
+//    }
 
     @Override
     public int getItemCount() {

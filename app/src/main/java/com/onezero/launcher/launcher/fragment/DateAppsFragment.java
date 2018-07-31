@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.presenter.LauncherPresenter;
+import com.onezero.launcher.launcher.utils.FragmentHelper;
 import com.onezero.launcher.launcher.utils.StringUtils;
 import com.onezero.launcher.launcher.view.ITimeView;
 
@@ -34,6 +36,7 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
     private List<AppInfo> list;
     private RecyclerView firstRecyclerView;
     private IntentFilter filter;
+    private LauncherRecyclerViewAdapter adapter;
 
     public DateAppsFragment() {
     }
@@ -53,7 +56,7 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
     @Override
     protected void initData() {
         presenter = new LauncherPresenter(this);
-        LauncherRecyclerViewAdapter adapter = new LauncherRecyclerViewAdapter(this.getContext(), list);
+        adapter = new LauncherRecyclerViewAdapter(this.getContext(), list);
         firstRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         adapter.setOnClickListener(new RecyclerViewClickListener() {
             @Override
@@ -67,6 +70,17 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
             }
         });
         firstRecyclerView.setAdapter(adapter);
+        firstRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int action = motionEvent.getAction();
+                if (action == MotionEvent.ACTION_DOWN) {
+                    FragmentHelper.resetRemoveIcon(list);
+                    adapter.notifyDataSetChanged();
+                }
+                return true;
+            }
+        });
 
     }
 

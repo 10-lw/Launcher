@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Launcher</string>
     <string name="can_not_remove_system_app">System application can\'t be removed.</string>
+    <string name="remove_app_confirm">Do you want remove this application?</string>
+    <string name="ok">Yes</string>
+    <string name="cancel">Cancel</string>
 </resources>
