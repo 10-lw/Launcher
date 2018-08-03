@@ -8,14 +8,15 @@ import android.util.Log;
 import com.onezero.launcher.launcher.activity.UnitTestActivity;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
+import com.onezero.launcher.launcher.callback.CalculateCallBack;
 import com.onezero.launcher.launcher.fragment.BaseAppFragment;
 import com.onezero.launcher.launcher.utils.FragmentHelper;
 
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class LauncherTest extends ActivityInstrumentationTestCase2<UnitTestActivity> {
 
@@ -34,7 +35,7 @@ public class LauncherTest extends ActivityInstrumentationTestCase2<UnitTestActiv
     @Test
     public void testQueryAllApps() throws Exception {
         PackageManager pm = mActivity.getPackageManager();
-        ArrayList<AppInfo> appInfos = AppInfoUtils.queryAllAppInfo(pm);
+        List<AppInfo> appInfos = AppInfoUtils.queryAllAppInfo(pm);
         Log.d("tag", "-============="+appInfos.size());
         assertTrue(appInfos != null);
         assertTrue(appInfos.size() > 0);
@@ -43,19 +44,26 @@ public class LauncherTest extends ActivityInstrumentationTestCase2<UnitTestActiv
 
     @Test
     public void testGetFragmentList() throws Exception {
-        List<Fragment> fragmentList = FragmentHelper.getFragmentList(mActivity);
-        assertTrue(fragmentList != null);
-        assertTrue(fragmentList.size() >= 2);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        FragmentHelper.getFragmentList(mActivity, new CalculateCallBack() {
+            @Override
+            public void calculateSuccessful(List<Fragment> list) {
+                List<Fragment> fragmentList = list;
+                assertTrue(fragmentList != null);
+                assertTrue(fragmentList.size() >= 2);
 
-        BaseAppFragment fragment = (BaseAppFragment)fragmentList.get(0);
-        int firstPageCount = mActivity.getResources().getInteger(R.integer.launcher_first_page_app_counts);
-        assertTrue(fragment.getAppListInfo().size() == firstPageCount);
+                BaseAppFragment fragment = (BaseAppFragment)fragmentList.get(0);
+                int firstPageCount = mActivity.getResources().getInteger(R.integer.launcher_first_page_app_counts);
+                assertTrue(fragment.getAppListInfo().size() == firstPageCount);
 
 
-        BaseAppFragment dateAppFragment = (BaseAppFragment)fragmentList.get(0);
-        int perPageMaxCount = mActivity.getResources().getInteger(R.integer.launcher_per_page_app_max_counts);
-        assertTrue(dateAppFragment.getAppListInfo().size() <= perPageMaxCount);
+                BaseAppFragment dateAppFragment = (BaseAppFragment)fragmentList.get(0);
+                int perPageMaxCount = mActivity.getResources().getInteger(R.integer.launcher_per_page_app_max_counts);
+                assertTrue(dateAppFragment.getAppListInfo().size() <= perPageMaxCount);
+                countDownLatch.countDown();
+            }
+        });
+        countDownLatch.wait();
     }
-
 
 }
