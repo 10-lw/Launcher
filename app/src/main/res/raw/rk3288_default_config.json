@@ -1,0 +1,5 @@
+{
+  "confirm_apps_on_launcher_bottom": [
+    "com.android.browser", "com.android.settings"
+  ]
+}

@@ -17,6 +17,7 @@ import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.event.OnLauncherToucheEvent;
 import com.onezero.launcher.launcher.utils.FragmentHelper;
+import com.onezero.launcher.launcher.utils.ResourceUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -50,6 +51,7 @@ public class Launcher extends AppCompatActivity {
     }
 
     private void initPageView() {
+        ResourceUtil.getRawResourceString(this, "rk3288_config", this.getPackageName());
         FragmentHelper.getFragmentList(this, new CalculateCallBack() {
             @Override
             public void calculateSuccessful(List<Fragment> list) {

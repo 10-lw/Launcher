@@ -66,6 +66,7 @@ public class AppInfoUtils {
 
             String activityName = info.activityInfo.name;
             String packageName = info.activityInfo.packageName;
+            Log.d("tag", "======packageName=========="+packageName);
             appInfo.setIntent(pm.getLaunchIntentForPackage(packageName));
 
             appInfo.setAppLabel((String) info.loadLabel(pm));
