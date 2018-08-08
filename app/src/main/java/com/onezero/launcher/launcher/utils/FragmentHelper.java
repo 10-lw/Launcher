@@ -1,7 +1,6 @@
 package com.onezero.launcher.launcher.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
@@ -29,8 +28,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class FragmentHelper {
 
-    public static void getFragmentList(final Activity context, final CalculateCallBack calculateCallBack) {
-        AppInfoUtils.queryAllAppInfoTask(context.getPackageManager(), new QueryCallBack() {
+    public static void getFragmentList(final Activity context, List<String> excludeList, final CalculateCallBack calculateCallBack) {
+        AppInfoUtils.queryAllAppInfoTask(context.getPackageManager(), excludeList, new QueryCallBack() {
             @Override
             public void querySuccessful(final List<AppInfo> list) {
                 Observable.create(new ObservableOnSubscribe<List<Fragment>>() {
@@ -53,6 +52,7 @@ public class FragmentHelper {
     private static List<Fragment> calculateFragments(Activity context, List<AppInfo> appInfos) {
         List<Fragment> fragments = new ArrayList<>();
         int size = appInfos.size();
+        Log.d("tag", "=========sie="+size);
         int firstPageAppCount = context.getResources().getInteger(R.integer.launcher_first_page_app_counts);
         int perPageMaxAppCount = context.getResources().getInteger(R.integer.launcher_per_page_app_max_counts);
         if (size > 0) {

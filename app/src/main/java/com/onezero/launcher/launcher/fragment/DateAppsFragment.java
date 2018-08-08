@@ -22,6 +22,7 @@ import com.onezero.launcher.launcher.view.ITimeView;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
     private TextView dateText;
     private LauncherPresenter presenter;
     private DateReceiver dateReceiver;
-    private List<AppInfo> list;
+    private List<AppInfo> list = new ArrayList<>();
     private RecyclerView firstRecyclerView;
     private IntentFilter filter;
     private LauncherRecyclerViewAdapter adapter;
@@ -56,7 +57,10 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
     @Override
     protected void initData() {
         presenter = new LauncherPresenter(this);
-        adapter = new LauncherRecyclerViewAdapter(this.getContext(), list);
+        adapter = new LauncherRecyclerViewAdapter(this.getContext());
+        if (list != null) {
+            adapter.setAppinfoData(list);
+        }
         firstRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 4));
         adapter.setOnClickListener(new RecyclerViewClickListener() {
             @Override
@@ -127,7 +131,11 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
 
     @Override
     public void setAppInfos(List<AppInfo> list) {
-        this.list = list;
+        this.list.clear();
+        this.list.addAll(list);
+        if (adapter != null) {
+            adapter.setAppinfoData(list);
+        }
     }
 
     @Override

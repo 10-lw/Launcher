@@ -19,16 +19,18 @@ import com.onezero.launcher.launcher.utils.FragmentHelper;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AllAppsFragment extends BaseAppFragment {
 
     private RecyclerView recyclerView;
+    private LauncherRecyclerViewAdapter adapter;
 
     public AllAppsFragment() {
     }
 
-    private List<AppInfo> list;
+    private List<AppInfo> list = new ArrayList<>();
 
     @Override
     protected int getLayoutId() {
@@ -43,7 +45,10 @@ public class AllAppsFragment extends BaseAppFragment {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void initData() {
-        final LauncherRecyclerViewAdapter adapter = new LauncherRecyclerViewAdapter(getContext(), list);
+        adapter = new LauncherRecyclerViewAdapter(getContext());
+        if (list != null) {
+            adapter.setAppinfoData(list);
+        }
         adapter.setOnClickListener(new RecyclerViewClickListener() {
             @Override
             public void onItemClick(AppInfo info) {
@@ -72,7 +77,11 @@ public class AllAppsFragment extends BaseAppFragment {
 
     @Override
     public void setAppInfos(List<AppInfo> list) {
-        this.list = list;
+        this.list.clear();
+        this.list.addAll(list);
+        if (adapter != null) {
+            adapter.setAppinfoData(list);
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.onezero.launcher.launcher.appInfo;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -26,11 +27,12 @@ public class AppInfoUtils {
 
     private static List<AppInfo> appInfos;
 
-    public static void queryAllAppInfoTask(final PackageManager pm, final QueryCallBack callBack) {
+    @SuppressLint("CheckResult")
+    public static void queryAllAppInfoTask(final PackageManager pm, final List<String> excludeList, final QueryCallBack callBack) {
         Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
             public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
-                List<AppInfo> list = queryAllAppInfo(pm);
+                List<AppInfo> list = queryAllAppInfo(pm, excludeList);
                 if (list != null) {
                     emitter.onNext(list);
                 } else {
@@ -46,7 +48,7 @@ public class AppInfoUtils {
                 });
     }
 
-    public static List<AppInfo> queryAllAppInfo(PackageManager pm) {
+    public static List<AppInfo> queryAllAppInfo(PackageManager pm, List<String> excludeList) {
         if (appInfos == null) {
             appInfos = new ArrayList<>();
         }
@@ -57,15 +59,18 @@ public class AppInfoUtils {
         Collections.sort(resolveInfoList, new ResolveInfo.DisplayNameComparator(pm));
         for (ResolveInfo info : resolveInfoList) {
             AppInfo appInfo = new AppInfo();
+            String packageName = info.activityInfo.packageName;
+            if (excludeList.contains(packageName)) {
+                continue;
+            }
             try {
-                ApplicationInfo applicationInfo = pm.getApplicationInfo(info.activityInfo.packageName, PackageManager.GET_META_DATA);
+                ApplicationInfo applicationInfo = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
                 appInfo.setAppIconId(pm.getApplicationIcon(applicationInfo));
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
 
             String activityName = info.activityInfo.name;
-            String packageName = info.activityInfo.packageName;
             Log.d("tag", "======packageName=========="+packageName);
             appInfo.setIntent(pm.getLaunchIntentForPackage(packageName));
 

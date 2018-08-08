@@ -12,16 +12,21 @@ import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
 import com.onezero.launcher.launcher.utils.FragmentHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewHolder> {
     private Context mContext;
     private RecyclerViewClickListener listener;
-    private List<AppInfo> list;
+    private List<AppInfo> dataList = new ArrayList<>();
 
-    public LauncherRecyclerViewAdapter(Context context, List<AppInfo> list) {
-        this.list = list;
+    public LauncherRecyclerViewAdapter(Context context) {
         this.mContext = context;
+    }
+
+    public void  setAppinfoData( List<AppInfo> list) {
+        this.dataList.addAll(list);
+        notifyDataSetChanged();
     }
 
     public void setOnClickListener(RecyclerViewClickListener listener) {
@@ -36,7 +41,7 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
 
     @Override
     public void onBindViewHolder(final AppInfoViewHolder holder, final int position) {
-        final AppInfo appInfo = list.get(position);
+        final AppInfo appInfo = dataList.get(position);
         final boolean isSystemApp = appInfo.isSystemApp();
         holder.icon.setImageDrawable(appInfo.getAppIconId());
         holder.label.setText(appInfo.getAppLabel());
@@ -47,7 +52,7 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
                 if (!appInfo.isRemoveable()) {
                     listener.onItemClick(appInfo);
                 }
-                FragmentHelper.resetRemoveIcon(list);
+                FragmentHelper.resetRemoveIcon(dataList);
                 notifyItemChanged(position);
             }
         });
@@ -85,6 +90,6 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
 
     @Override
     public int getItemCount() {
-        return list == null ? 0 : list.size();
+        return dataList == null ? 0 : dataList.size();
     }
 }
