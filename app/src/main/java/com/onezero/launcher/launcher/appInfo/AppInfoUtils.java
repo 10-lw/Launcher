@@ -92,4 +92,22 @@ public class AppInfoUtils {
         Log.w("tag", "query app info error");
         return new ArrayList<>();
     }
+
+    public static AppInfo getAppInfoByPkgName(PackageManager pm, String pkgName) {
+        AppInfo appInfo = new AppInfo();
+
+        try {
+            ApplicationInfo applicationInfo = pm.getApplicationInfo(pkgName, PackageManager.GET_META_DATA);
+            Intent launchIntentForPackage = pm.getLaunchIntentForPackage(pkgName);
+            CharSequence label = pm.getApplicationLabel(applicationInfo);
+            appInfo.setPkgName(pkgName);
+            appInfo.setIntent(launchIntentForPackage);
+            appInfo.setAppLabel(label.toString());
+            appInfo.setAppIconId(pm.getApplicationIcon(applicationInfo));
+            appInfo.setRemoveable(false);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return appInfo;
+    }
 }

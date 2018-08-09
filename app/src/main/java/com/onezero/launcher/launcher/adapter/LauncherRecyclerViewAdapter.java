@@ -82,12 +82,6 @@ public class LauncherRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoVie
 
     }
 
-//    public static void resetRemoveIcon(List<AppInfo> list) {
-//        for (int i = 0; i < list.size(); i++) {
-//            list.get(i).setRemoveable(false);
-//        }
-//    }
-
     @Override
     public int getItemCount() {
         return dataList == null ? 0 : dataList.size();
