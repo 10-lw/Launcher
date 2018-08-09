@@ -20,7 +20,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * Created by lizeiwei on 2018/7/28.
+ * Created by lw on 2018/7/28.
  */
 
 public class AppInfoUtils {
@@ -33,6 +33,7 @@ public class AppInfoUtils {
             @Override
             public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
                 List<AppInfo> list = queryAllAppInfo(pm, excludeList);
+
                 if (list != null) {
                     emitter.onNext(list);
                 } else {
@@ -48,7 +49,7 @@ public class AppInfoUtils {
                 });
     }
 
-    public static List<AppInfo> queryAllAppInfo(PackageManager pm, List<String> excludeList) {
+    public synchronized static List<AppInfo> queryAllAppInfo(PackageManager pm, List<String> excludeList) {
         if (appInfos == null) {
             appInfos = new ArrayList<>();
         }
@@ -71,7 +72,6 @@ public class AppInfoUtils {
             }
 
             String activityName = info.activityInfo.name;
-            Log.d("tag", "======packageName=========="+packageName);
             appInfo.setIntent(pm.getLaunchIntentForPackage(packageName));
 
             appInfo.setAppLabel((String) info.loadLabel(pm));

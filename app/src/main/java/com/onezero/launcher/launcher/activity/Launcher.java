@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.LauncherPageAdapter;
@@ -45,13 +46,14 @@ public class Launcher extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         initData();
-        initPageView();
+
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
         if (viewPager != null) {
             viewPager.setCurrentItem(currentPosition);
         }
+        initPageView();
     }
 
     private void initData() {
@@ -60,6 +62,7 @@ public class Launcher extends AppCompatActivity {
     }
 
     private void initPageView() {
+        Log.d("ffff", "=========initPageView=====");
         FragmentHelper.getFragmentList(this, excludeAppsConfigs, new CalculateCallBack() {
             @Override
             public void calculateSuccessful(List<Fragment> list) {
