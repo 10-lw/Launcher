@@ -8,7 +8,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.LauncherPageAdapter;
@@ -29,7 +28,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Launcher extends AppCompatActivity {
+public class LastLauncher extends AppCompatActivity {
 
 
     private ViewPager viewPager;
@@ -43,7 +42,7 @@ public class Launcher extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_launcher);
+        setContentView(R.layout.activity_last_launcher);
         Drawable wallPaper = WallpaperManager.getInstance(this).getDrawable();
         this.getWindow().setBackgroundDrawable(wallPaper);
         initViews();
