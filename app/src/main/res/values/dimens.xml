@@ -10,4 +10,5 @@
     <dimen name="bottom_content_padding_board">30dp</dimen>
     <dimen name="bottom_content_page_indicator_height">8dp</dimen>
     <dimen name="page_indicator_dot_size">4dp</dimen>
+    <dimen name="app_content_margin_top">15dp</dimen>
 </resources>

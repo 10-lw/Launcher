@@ -182,6 +182,15 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
             appsContentAdapter.setAppinfoData(list);
         }
         appContent.setAdapter(appsContentAdapter);
+        calculateIndicators(list);
+
+        HorizontalPageLayoutManager layoutManager = new HorizontalPageLayoutManager(fullPageRows, columns);
+        appContent.setLayoutManager(layoutManager);
+        appContent.setHorizontalScrollBarEnabled(true);
+
+    }
+
+    private int calculateIndicators(List<AppInfo> list) {
         int size = list.size();
         int firstPageRows = getResources().getInteger(R.integer.first_page_rows);
         int firstPageAppCount = columns * firstPageRows;
@@ -193,10 +202,8 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
         } else {
             indicatorCount = (size - firstPageAppCount) / (fullPageRows * columns) + 1 + 1;
         }
-        HorizontalPageLayoutManager layoutManager = new HorizontalPageLayoutManager(fullPageRows, columns);
-        appContent.setLayoutManager(layoutManager);
-        appContent.setHorizontalScrollBarEnabled(true);
         pageIndicator.initIndicator(indicatorCount);
+        return indicatorCount;
     }
 
     @Override
@@ -219,10 +226,22 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
 
     @Subscribe
     public void onPackageChanged(PackageChangedEvent event) {
-//        calculateIndicators();
         if (event.isNewAdd()) {
             appDataList.add(AppInfoUtils.getAppInfoByPkgName(getPackageManager(), event.getPkgName()));
-            appsContentAdapter.notifyDataSetChanged();
+
         }
+        if (!event.isNewAdd()) {
+            AppInfo info = null;
+            for (int i = 0; i < appDataList.size(); i++) {
+                if (appDataList.get(i).getPkgName().equalsIgnoreCase(event.getPkgName())) {
+                    info = appDataList.get(i);
+                    break;
+                }
+            }
+            appDataList.remove(info);
+        }
+        int i = calculateIndicators(appDataList);
+        pagingScrollHelper.scrollToPosition(i-1);
+        appsContentAdapter.notifyDataSetChanged();
     }
 }
