@@ -3,21 +3,18 @@ package com.onezero.launcher.launcher.fragment;
 import android.annotation.SuppressLint;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.onezero.launcher.launcher.R;
-import com.onezero.launcher.launcher.adapter.LauncherRecyclerViewAdapter;
+import com.onezero.launcher.launcher.adapter.PageRecyclerViewAdapter;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
-import com.onezero.launcher.launcher.event.OnLauncherToucheEvent;
 import com.onezero.launcher.launcher.utils.FragmentHelper;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,7 @@ import java.util.List;
 public class AllAppsFragment extends BaseAppFragment {
 
     private RecyclerView recyclerView;
-    private LauncherRecyclerViewAdapter adapter;
+    private PageRecyclerViewAdapter adapter;
 
     public AllAppsFragment() {
     }
@@ -45,7 +42,7 @@ public class AllAppsFragment extends BaseAppFragment {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void initData() {
-        adapter = new LauncherRecyclerViewAdapter(getContext());
+        adapter = new PageRecyclerViewAdapter(getContext());
         if (list != null) {
             adapter.setAppinfoData(list);
         }

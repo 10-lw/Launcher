@@ -1,13 +1,17 @@
 package com.onezero.launcher.launcher.appInfo;
 
 import android.content.Intent;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.graphics.drawable.Drawable;
+
+import com.onezero.launcher.launcher.BR;
 
 /**
  * Created by lizeiwei on 2018/7/28.
  */
 
-public class AppInfo {
+public class AppInfo extends BaseObservable {
     private String appLabel;    //应用程序标签
     private Drawable appIconId ;  //应用程序图像
     private Intent intent ;     //启动应用程序的Intent ，一般是Action为Main和Category为Lancher的Activity
@@ -15,12 +19,14 @@ public class AppInfo {
     private boolean isSystemApp;
     private boolean removeable;
 
+    @Bindable
     public String getAppLabel() {
         return appLabel;
     }
 
     public void setAppLabel(String appLabel) {
         this.appLabel = appLabel;
+        notifyPropertyChanged(BR.appLabel);
     }
 
 
@@ -40,6 +46,7 @@ public class AppInfo {
         this.pkgName = pkgName;
     }
 
+    @Bindable
     public Drawable getAppIconId() {
         return appIconId;
     }
@@ -48,23 +55,27 @@ public class AppInfo {
         this.appIconId = appIconId;
     }
 
+    @Bindable
     public boolean isSystemApp() {
         return isSystemApp;
     }
 
     public void setSystemApp(boolean systemApp) {
         isSystemApp = systemApp;
+        notifyPropertyChanged(BR.systemApp);
     }
 
     public AppInfo() {
     }
 
+    @Bindable
     public boolean isRemoveable() {
         return removeable;
     }
 
     public void setRemoveable(boolean removeable) {
         this.removeable = removeable;
+        notifyPropertyChanged(BR.removeable);
     }
 
     public AppInfo(String appLabel, Drawable appIconId, Intent intent, String pkgName) {

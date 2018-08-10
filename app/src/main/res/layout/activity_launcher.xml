@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.Launcher">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <FrameLayout
+            android:id="@+id/time_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent">
+
+            <include layout="@layout/time_layout"
+                android:layout_marginTop="50dp"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent" />
+        </FrameLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_marginTop="5dp"
+            android:id="@+id/app_content_view"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+
+    <com.onezero.launcher.launcher.view.PageIndicatorView
+        android:id="@+id/page_indicator"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_height="@dimen/bottom_content_page_indicator_height" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/launcher_bottom_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:minHeight="50dp"
+        android:paddingLeft="@dimen/bottom_content_padding_board"
+        android:paddingRight="@dimen/bottom_content_padding_board" />
+</LinearLayout>

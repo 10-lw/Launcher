@@ -11,7 +11,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.LauncherPageAdapter;
-import com.onezero.launcher.launcher.adapter.LauncherRecyclerViewAdapter;
+import com.onezero.launcher.launcher.adapter.PageRecyclerViewAdapter;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
@@ -63,7 +63,7 @@ public class LastLauncher extends AppCompatActivity {
     }
 
     private void initBottomContent() {
-        LauncherRecyclerViewAdapter bottomAdapter = new LauncherRecyclerViewAdapter(this);
+        PageRecyclerViewAdapter bottomAdapter = new PageRecyclerViewAdapter(this);
         if (bottomAppInfos != null) {
             bottomAdapter.setAppinfoData(bottomAppInfos);
             bottomContent.setLayoutManager(new GridLayoutManager(this, bottomAppInfos.size()));

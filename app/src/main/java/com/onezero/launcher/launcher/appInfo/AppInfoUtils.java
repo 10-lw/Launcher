@@ -16,6 +16,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -41,6 +42,7 @@ public class AppInfoUtils {
                 }
             }
         }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<AppInfo>>() {
                     @Override
                     public void accept(List<AppInfo> list) throws Exception {

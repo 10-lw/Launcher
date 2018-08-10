@@ -5,7 +5,9 @@
     <dimen name="launcher_text_clock_text_size">46sp</dimen>
     <dimen name="launcher_time_padding">40dp</dimen>
     <dimen name="launcher_time_padding_top">20dp</dimen>
-    <dimen name="launcher_app_icon_size">60dp</dimen>
-    <dimen name="launcher_app_label_text_size">13sp</dimen>
+    <dimen name="launcher_app_icon_size">40dp</dimen>
+    <dimen name="launcher_app_label_text_size">8sp</dimen>
     <dimen name="bottom_content_padding_board">30dp</dimen>
+    <dimen name="bottom_content_page_indicator_height">8dp</dimen>
+    <dimen name="page_indicator_dot_size">4dp</dimen>
 </resources>

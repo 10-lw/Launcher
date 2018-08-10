@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.onezero.launcher.launcher.DateReceiver;
 import com.onezero.launcher.launcher.R;
-import com.onezero.launcher.launcher.adapter.LauncherRecyclerViewAdapter;
+import com.onezero.launcher.launcher.adapter.PageRecyclerViewAdapter;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
@@ -37,7 +37,7 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
     private List<AppInfo> list = new ArrayList<>();
     private RecyclerView firstRecyclerView;
     private IntentFilter filter;
-    private LauncherRecyclerViewAdapter adapter;
+    private PageRecyclerViewAdapter adapter;
 
     public DateAppsFragment() {
     }
@@ -57,7 +57,7 @@ public class DateAppsFragment extends BaseAppFragment implements ITimeView {
     @Override
     protected void initData() {
         presenter = new LauncherPresenter(this);
-        adapter = new LauncherRecyclerViewAdapter(this.getContext());
+        adapter = new PageRecyclerViewAdapter(this.getContext());
         if (list != null) {
             adapter.setAppinfoData(list);
         }
