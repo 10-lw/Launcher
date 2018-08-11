@@ -24,6 +24,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize|locale|screenLayout|mcc|mnc|navigation"
             android:enabled="true"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:resumeWhilePausing="true"
             android:theme="@style/LauncherActivityTheme">
             <intent-filter>

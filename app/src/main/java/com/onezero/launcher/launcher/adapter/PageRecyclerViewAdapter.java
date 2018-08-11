@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.callback.RecyclerViewClickListener;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
@@ -23,12 +24,12 @@ import java.util.List;
 
 public class PageRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewHolder> {
     private Context mContext;
-    private RecyclerViewClickListener listener;
     private List<AppInfo> dataList;
     private int firstPageRows;
     private int fullPageRows;
     private int columns;
     private int hideCounts;
+    private boolean enterRemoveMode = false;
 
     public PageRecyclerViewAdapter(Context context) {
         this.mContext = context;
@@ -47,10 +48,6 @@ public class PageRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewHol
         notifyDataSetChanged();
     }
 
-    public void setOnClickListener(RecyclerViewClickListener listener) {
-        this.listener = listener;
-    }
-
     @Override
     public AppInfoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.app_info_item, parent, false);
@@ -59,7 +56,6 @@ public class PageRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewHol
 
     @Override
     public void onBindViewHolder(final AppInfoViewHolder holder, final int position) {
-        Log.d("tag", "=====onBindViewHolder====position:" + position);
         if (position <= (hideCounts - 1)) {
             holder.itemLayout.setVisibility(View.GONE);
         } else if (position > (hideCounts - 1)) {
@@ -71,12 +67,12 @@ public class PageRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewHol
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    EventBus.getDefault().post(new OnAppItemClickEvent(appInfo));
-                    if (!appInfo.isRemoveable() && listener != null) {
-//                        listener.onItemClick(appInfo);
+                    if (!appInfo.isRemoveable()) {
+                        EventBus.getDefault().post(new OnAppItemClickEvent(appInfo));
                     }
-//                    FragmentHelper.resetRemoveIcon(dataList);
-//                    notifyItemChanged(position);
+                    enterRemoveMode = false;
+                    AppInfoUtils.resetAllAppRemoveableState(dataList);
+                    notifyDataSetChanged();
                 }
             });
 
@@ -87,6 +83,7 @@ public class PageRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewHol
                         Toast.makeText(mContext, R.string.can_not_remove_system_app, Toast.LENGTH_LONG).show();
                         return true;
                     }
+                    enterRemoveMode = true;
                     appInfo.setRemoveable(true);
                     notifyDataSetChanged();
                     return true;
@@ -97,9 +94,10 @@ public class PageRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewHol
             holder.removeIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    enterRemoveMode = false;
                     EventBus.getDefault().post(new OnAppItemRemoveClickEvent(appInfo));
                     appInfo.setRemoveable(false);
-                    notifyItemChanged(position);
+                    notifyDataSetChanged();
                 }
             });
         }
@@ -109,5 +107,15 @@ public class PageRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewHol
     @Override
     public int getItemCount() {
         return dataList == null ? 0 : (dataList.size() + hideCounts);
+    }
+
+    public boolean resetState() {
+        if (enterRemoveMode) {
+            AppInfoUtils.resetAllAppRemoveableState(dataList);
+            notifyDataSetChanged();
+            return true;
+        } else {
+            return false;
+        }
     }
 }

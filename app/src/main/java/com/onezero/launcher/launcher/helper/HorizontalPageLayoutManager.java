@@ -6,10 +6,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
-import com.onezero.launcher.launcher.callback.PageDecorationLastJudge;
 
-
-public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager implements PageDecorationLastJudge {
+public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager {
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
         return null;
@@ -176,37 +174,6 @@ public class HorizontalPageLayoutManager extends RecyclerView.LayoutManager impl
             }
         }
 
-    }
-
-
-    @Override
-    public boolean isLastRow(int index) {
-        if (index >= 0 && index < getItemCount()) {
-            int indexOfPage = index % onePageSize;
-            indexOfPage++;
-            if (indexOfPage > (rows - 1) * columns && indexOfPage <= onePageSize) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean isLastColumn(int position) {
-        if (position >= 0 && position < getItemCount()) {
-            position++;
-            if (position % columns == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean isPageLast(int position) {
-        position++;
-        return position % onePageSize == 0;
     }
 
     @Override

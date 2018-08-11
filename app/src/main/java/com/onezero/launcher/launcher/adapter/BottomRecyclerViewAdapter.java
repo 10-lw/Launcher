@@ -33,7 +33,8 @@ public class BottomRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewH
     public void onBindViewHolder(AppInfoViewHolder holder, int position) {
         final AppInfo appInfo = dataList.get(position);
         holder.icon.setImageDrawable(appInfo.getAppIconId());
-        holder.label.setText(appInfo.getAppLabel());
+//        holder.label.setText(appInfo.getAppLabel());
+        holder.label.setVisibility(View.GONE);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
