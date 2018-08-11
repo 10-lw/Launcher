@@ -9,6 +9,9 @@ import android.util.Log;
 
 import com.onezero.launcher.launcher.R;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import io.reactivex.Observable;
@@ -101,7 +104,7 @@ public class ApplicationHelper {
         Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
-                boolean b = clientUninstall(pkgName);
+                boolean b = pmUninstall(pkgName);
                 emitter.onNext(b);
             }
         }).subscribeOn(Schedulers.newThread())
@@ -180,6 +183,34 @@ public class ApplicationHelper {
             }
         }
         return false;
+    }
+
+
+
+    private static boolean pmUninstall(String pkgName) {
+        String[] args = { "pm", "uninstall", pkgName };
+        ProcessBuilder processBuilder = new ProcessBuilder(args);
+        Process process = null;
+        BufferedReader successResult = null;
+        BufferedReader errorResult = null;
+        StringBuilder successMsg = new StringBuilder();
+        StringBuilder errorMsg = new StringBuilder();
+        String str = null;
+        try {
+            process = processBuilder.start();
+            successResult = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            errorResult = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            while ((str = successResult.readLine()) != null ) {
+                successMsg.append(str);
+            }
+            while ((str = errorResult.readLine()) != null) {
+                errorMsg.append(str);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return successMsg.toString().equalsIgnoreCase("success");
     }
 
     private static boolean returnResult(int value) {

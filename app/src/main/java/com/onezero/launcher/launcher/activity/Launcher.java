@@ -136,6 +136,11 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
             dateReceiver = null;
         }
 
+        if (appChangeReceiver != null) {
+            unregisterReceiver(appChangeReceiver);
+            appChangeReceiver =null;
+        }
+
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
