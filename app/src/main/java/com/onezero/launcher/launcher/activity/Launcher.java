@@ -28,6 +28,7 @@ import com.onezero.launcher.launcher.helper.PagingScrollHelper;
 import com.onezero.launcher.launcher.presenter.LauncherPresenter;
 import com.onezero.launcher.launcher.utils.DeviceConfig;
 import com.onezero.launcher.launcher.utils.StringUtils;
+import com.onezero.launcher.launcher.utils.ToastUtils;
 import com.onezero.launcher.launcher.view.IAppContentView;
 import com.onezero.launcher.launcher.view.ITimeView;
 import com.onezero.launcher.launcher.view.PageIndicatorView;
@@ -138,11 +139,18 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
 
         if (appChangeReceiver != null) {
             unregisterReceiver(appChangeReceiver);
-            appChangeReceiver =null;
+            appChangeReceiver = null;
         }
 
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!appsContentAdapter.resetState()) {
+            ToastUtils.showToast(this, R.string.have_been_to_desktop);
         }
     }
 
@@ -177,6 +185,7 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
 
     /**
      * start layout the content of all apps
+     *
      * @param list
      */
     @Override
@@ -246,7 +255,7 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
             appDataList.remove(info);
         }
         int i = calculateIndicators(appDataList);
-        pagingScrollHelper.scrollToPosition(i-1);
+        pagingScrollHelper.scrollToPosition(i - 1);
         appsContentAdapter.notifyDataSetChanged();
     }
 }
