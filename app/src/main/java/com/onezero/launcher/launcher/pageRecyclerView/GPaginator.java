@@ -1,4 +1,6 @@
-package com.onezero.launcher.launcher.view;
+package com.onezero.launcher.launcher.pageRecyclerView;
+
+import android.util.Log;
 
 public class GPaginator {
     private int rows;

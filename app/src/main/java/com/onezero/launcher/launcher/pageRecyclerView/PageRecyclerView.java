@@ -1,4 +1,4 @@
-package com.onezero.launcher.launcher.view;
+package com.onezero.launcher.launcher.pageRecyclerView;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -6,14 +6,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 
-import com.onezero.launcher.launcher.pageRecyclerView.DisableScrollGridManager;
-import com.onezero.launcher.launcher.pageRecyclerView.DisableScrollLinearManager;
-import com.onezero.launcher.launcher.pageRecyclerView.PageTurningSimpleDetector;
+import com.onezero.launcher.launcher.view.PageTurningSimpleDirection;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -31,12 +30,11 @@ public class PageRecyclerView extends RecyclerView {
     private int columns = 1;
     private float lastX, lastY;
     private OnChangeFocusListener onChangeFocusListener;
-    private Map<Integer, String> keyBindingMap = new Hashtable<>();
     private int originPaddingBottom;
     private int itemDecorationHeight = 0;
 
     public interface OnPagingListener {
-        void onPageChange(int position, int itemCount, int pageSize);
+        void onPageChange(int position, int itemCount, int pageSize, int currentPage);
     }
 
     public interface OnChangeFocusListener {
@@ -216,6 +214,7 @@ public class PageRecyclerView extends RecyclerView {
                 lastY = ev.getY();
                 break;
             case MotionEvent.ACTION_UP:
+
                 int direction = detectDirection(ev);
                 if (direction == PageTurningSimpleDirection.NEXT) {
                     nextPage();
@@ -235,6 +234,7 @@ public class PageRecyclerView extends RecyclerView {
     public void setOnPagingListener(OnPagingListener listener) {
         this.onPagingListener = listener;
     }
+
 
     public void prevPage() {
         if (paginator.prevPage()) {
@@ -261,7 +261,7 @@ public class PageRecyclerView extends RecyclerView {
         }
         managerScrollToPosition(position);
         if (onPagingListener != null) {
-            onPagingListener.onPageChange(position, getAdapter().getItemCount(), rows * columns);
+            onPagingListener.onPageChange(position, getAdapter().getItemCount(), rows * columns, paginator.getCurrentPage());
         }
     }
 

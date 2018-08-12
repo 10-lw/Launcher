@@ -9,12 +9,12 @@ public class DisableScrollGridManager  extends GridLayoutManager{
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public DisableScrollGridManager(Context context, int spanCount) {
-        super(context, spanCount);
+    public DisableScrollGridManager(Context context) {
+        super(context, 1);
     }
 
-    public DisableScrollGridManager(Context context, int spanCount, int orientation, boolean reverseLayout) {
-        super(context, spanCount, orientation, reverseLayout);
+    public DisableScrollGridManager(Context context, int orientation, boolean reverseLayout) {
+        super(context, 1, orientation, reverseLayout);
     }
 
     @Override

@@ -24,7 +24,7 @@
                 android:layout_width="match_parent" />
         </FrameLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <com.onezero.launcher.launcher.pageRecyclerView.PageRecyclerView
             android:id="@+id/app_content_view"
             android:layout_centerInParent="true"
             android:layout_width="match_parent"

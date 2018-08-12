@@ -8,14 +8,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.onezero.launcher.launcher.DateReceiver;
 import com.onezero.launcher.launcher.R;
+import com.onezero.launcher.launcher.adapter.AllAppsPageAdapter;
 import com.onezero.launcher.launcher.adapter.BottomRecyclerViewAdapter;
-import com.onezero.launcher.launcher.adapter.PageRecyclerViewAdapter;
 import com.onezero.launcher.launcher.appInfo.AppChangeReceiver;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
@@ -23,8 +25,8 @@ import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.event.PackageChangedEvent;
-import com.onezero.launcher.launcher.helper.HorizontalPageLayoutManager;
-import com.onezero.launcher.launcher.helper.PagingScrollHelper;
+import com.onezero.launcher.launcher.pageRecyclerView.DisableScrollGridManager;
+import com.onezero.launcher.launcher.pageRecyclerView.PageRecyclerView;
 import com.onezero.launcher.launcher.presenter.LauncherPresenter;
 import com.onezero.launcher.launcher.utils.DeviceConfig;
 import com.onezero.launcher.launcher.utils.StringUtils;
@@ -38,9 +40,9 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 
-public class Launcher extends AppCompatActivity implements PagingScrollHelper.onPageChangeListener, ITimeView, IAppContentView {
+public class Launcher extends AppCompatActivity implements ITimeView, IAppContentView, PageRecyclerView.OnPagingListener, View.OnTouchListener {
 
-    private RecyclerView appContent;
+    private PageRecyclerView appContent;
     private PageIndicatorView pageIndicator;
     private RecyclerView bottomAppContent;
     private FrameLayout timeLayout;
@@ -50,15 +52,17 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
     private DateReceiver dateReceiver;
     private IntentFilter dateChangeFilter;
     private List<String> excludeAppsConfigs;
-    private PageRecyclerViewAdapter appsContentAdapter;
-    private int currentPosition = 0;
+    private int currentPage = 0;
     private int fullPageRows;
-    private int columns;
-    private PagingScrollHelper pagingScrollHelper;
+    private int columns = 0;
     private List<String> bottomAppsConfigs;
     private AppChangeReceiver appChangeReceiver;
     private IntentFilter appChangeFilter;
     private List<AppInfo> appDataList;
+    private int firstPageRows;
+    private int hideCounts;
+    private AllAppsPageAdapter appsContentAdapter;
+    private boolean startApp = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +79,13 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
     protected void onResume() {
         super.onResume();
         presenter.updateTime();
-        initData();
-        initPagingScrollHelper();
+        if (!startApp) {
+            initData();
+        }
         initReceiver();
+        if (appContent != null && appContent.getAdapter() != null) {
+            appContent.gotoPage(currentPage);
+        }
     }
 
     private void initData() {
@@ -85,13 +93,6 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
         bottomAppsConfigs = DeviceConfig.getInstance(this).getBottomAppsConfigs();
         presenter.setAppContentView(getPackageManager(), excludeAppsConfigs);
         presenter.setBottomContentView(getPackageManager(), bottomAppsConfigs);
-    }
-
-    private void initPagingScrollHelper() {
-        pagingScrollHelper = new PagingScrollHelper();
-        pagingScrollHelper.setUpRecycleView(appContent);
-        pagingScrollHelper.setOnPageChangeListener(this);
-        pagingScrollHelper.scrollToPosition(currentPosition);
     }
 
     private void initViews() {
@@ -102,20 +103,11 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
         appContent = findViewById(R.id.app_content_view);
         fullPageRows = getResources().getInteger(R.integer.full_page_rows);
         columns = getResources().getInteger(R.integer.per_page_columens);
+        firstPageRows = getResources().getInteger(R.integer.first_page_rows);
+        hideCounts = (fullPageRows - firstPageRows) * columns;
 
         pageIndicator = findViewById(R.id.page_indicator);
         bottomAppContent = findViewById(R.id.launcher_bottom_area);
-    }
-
-    @Override
-    public void onPageChange(int index) {
-        currentPosition = index;
-        if (index == 0) {
-            timeLayout.setVisibility(View.VISIBLE);
-        } else {
-            timeLayout.setVisibility(View.GONE);
-        }
-        pageIndicator.setSelectedPage(index);
     }
 
     @Override
@@ -127,7 +119,6 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
             weekText.setText(week);
         }
     }
-
 
     @Override
     protected void onPause() {
@@ -189,19 +180,15 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
      * @param list
      */
     @Override
-    public void layoutAllAppsContent(List<AppInfo> list) {
+    public void layoutAllAppsContent(final List<AppInfo> list) {
         this.appDataList = list;
-        appsContentAdapter = new PageRecyclerViewAdapter(Launcher.this.getApplicationContext());
-        if (list != null) {
-            appsContentAdapter.setAppinfoData(list);
-        }
-        appContent.setAdapter(appsContentAdapter);
         calculateIndicators(list);
-
-        HorizontalPageLayoutManager layoutManager = new HorizontalPageLayoutManager(fullPageRows, columns);
-        appContent.setLayoutManager(layoutManager);
-        appContent.setHorizontalScrollBarEnabled(true);
-
+        DisableScrollGridManager manager = new DisableScrollGridManager(Launcher.this);
+        appContent.setLayoutManager(manager);
+        appsContentAdapter = new AllAppsPageAdapter(this, fullPageRows, columns, list, hideCounts);
+        appContent.setAdapter(appsContentAdapter);
+        appContent.setOnPagingListener(this);
+        appContent.setOnTouchListener(this);
     }
 
     private int calculateIndicators(List<AppInfo> list) {
@@ -230,6 +217,7 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
 
     @Subscribe
     public void onItemClick(OnAppItemClickEvent event) {
+        startApp = true;
         ApplicationHelper.performStartApp(this, event.getInfo());
     }
 
@@ -255,7 +243,28 @@ public class Launcher extends AppCompatActivity implements PagingScrollHelper.on
             appDataList.remove(info);
         }
         int i = calculateIndicators(appDataList);
-        pagingScrollHelper.scrollToPosition(i - 1);
         appsContentAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPageChange(int position, int itemCount, int pageSize, int page) {
+        currentPage = page;
+        if (currentPage == 0) {
+            timeLayout.setVisibility(View.VISIBLE);
+        } else {
+            timeLayout.setVisibility(View.GONE);
+        }
+        pageIndicator.setSelectedPage(currentPage);
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        if (view instanceof RecyclerView) {
+            if (motionEvent.getAction()== MotionEvent.ACTION_UP) {
+                appsContentAdapter.resetState();
+            }
+            return false;
+        }
+        return false;
     }
 }

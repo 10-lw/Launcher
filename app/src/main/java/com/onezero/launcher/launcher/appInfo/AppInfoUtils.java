@@ -113,7 +113,7 @@ public class AppInfoUtils {
         return appInfo;
     }
 
-    public static void resetAllAppRemoveableState(List<AppInfo>  list) {
+    public static void resetAllAppRemoveableState(List<AppInfo> list) {
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setRemoveable(false);
         }

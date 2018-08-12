@@ -1,13 +1,16 @@
 package com.onezero.launcher.launcher.adapter;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.onezero.launcher.launcher.BR;
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.databinding.AppInfoItemBinding;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -25,15 +28,16 @@ public class BottomRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewH
 
     @Override
     public AppInfoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.app_info_item, parent, false);
-        return new AppInfoViewHolder(view);
+        AppInfoItemBinding binding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.app_info_item, parent, false);
+        return new AppInfoViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(AppInfoViewHolder holder, int position) {
         final AppInfo appInfo = dataList.get(position);
-        holder.icon.setImageDrawable(appInfo.getAppIconId());
-//        holder.label.setText(appInfo.getAppLabel());
+        holder.getDatabinding().setVariable(BR.info, appInfo);
+//        holder.icon.setImageDrawable(appInfo.getAppIconId());
+////        holder.label.setText(appInfo.getAppLabel());
         holder.label.setVisibility(View.GONE);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,6 +45,8 @@ public class BottomRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewH
                 EventBus.getDefault().post(new OnAppItemClickEvent(appInfo));
             }
         });
+
+
     }
 
     @Override
