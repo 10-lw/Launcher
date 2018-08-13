@@ -2,5 +2,5 @@
 <resources>
     <integer name="first_page_rows">3</integer>
     <integer name="per_page_columens">4</integer>
-    <integer name="full_page_rows">7</integer>
+    <integer name="full_page_rows">6</integer>
 </resources>

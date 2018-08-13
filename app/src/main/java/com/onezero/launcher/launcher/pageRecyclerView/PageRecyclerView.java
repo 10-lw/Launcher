@@ -193,18 +193,22 @@ public class PageRecyclerView extends RecyclerView {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 lastX = ev.getX();
                 lastY = ev.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                return (detectDirection(ev) != PageTurningSimpleDirection.NONE);
+                int re = detectDirection(ev);
+                return (re != PageTurningSimpleDirection.NONE);
             default:
                 break;
         }
         return super.onInterceptTouchEvent(ev);
     }
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
@@ -218,10 +222,14 @@ public class PageRecyclerView extends RecyclerView {
                 int direction = detectDirection(ev);
                 if (direction == PageTurningSimpleDirection.NEXT) {
                     nextPage();
+                    super.onTouchEvent(ev);
                     return true;
                 } else if (direction == PageTurningSimpleDirection.PREV) {
                     prevPage();
+                    super.onTouchEvent(ev);
                     return true;
+                } else if (direction == PageTurningSimpleDirection.NONE) {
+                    return super.onTouchEvent(ev);
                 }
                 break;
             default:

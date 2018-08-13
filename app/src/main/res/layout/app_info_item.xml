@@ -16,6 +16,7 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
+        android:visibility="@{info.isVisiable ? View.VISIBLE : View.INVISIBLE}"
         android:layout_height="wrap_content">
 
         <LinearLayout
@@ -38,8 +39,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:ellipsize="end"
-                android:gravity="center"
-                android:paddingTop="5dp"
+                android:maxLines="1"
+                android:gravity="center_horizontal|top"
                 android:text="@{info.appLabel}"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/launcher_app_label_text_size" />
@@ -52,8 +53,8 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:clickable="true"
-            android:src="@mipmap/remove"
-            android:visibility="@{info.removeable ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{info.removeable ? View.VISIBLE : View.INVISIBLE}"
+            android:src="@mipmap/remove"/>
 
     </RelativeLayout>
 </layout>

@@ -2,6 +2,7 @@ package com.onezero.launcher.launcher.adapter;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,11 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
         this.hideCounts = hideCounts;
     }
 
+    public void setDataList(List<AppInfo> list) {
+        this.list = list;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getRowCount() {
         return fullPageRows;
@@ -55,7 +61,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
 
     @Override
     public int getDataCount() {
-        return list == null ? hideCounts : (list.size() + hideCounts);
+        return list == null ? 0 : (list.size());
     }
 
     @Override
@@ -66,15 +72,11 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
 
     @Override
     public void onPageBindViewHolder(AppInfoViewHolder holder, final int position) {
-        if (position <= (hideCounts - 1)) {
-            //holder.itemLayout.setVisibility(View.INVISIBLE);
-        } else if (position > (hideCounts - 1)) {
-            int actualPosition = position - hideCounts;
-            final AppInfo appInfo = list.get(actualPosition);
+            final AppInfo appInfo = list.get(position);
             final boolean isSystemApp = appInfo.isSystemApp();
             AppInfoItemBinding binding = holder.getDatabinding();
             binding.setVariable(BR.info, appInfo);
-//            binding.setInfo(appInfo);
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -108,7 +110,6 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
                     notifyItemChanged(position);
                 }
             });
-        }
     }
 
     public boolean resetState() {

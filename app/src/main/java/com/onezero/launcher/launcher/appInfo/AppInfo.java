@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.onezero.launcher.launcher.BR;
 
@@ -18,6 +19,7 @@ public class AppInfo extends BaseObservable {
     private String pkgName ;    //应用程序所对应的包名
     private boolean isSystemApp;
     private boolean removeable;
+    private boolean isVisiable;
 
     @Bindable
     public String getAppLabel() {
@@ -78,10 +80,34 @@ public class AppInfo extends BaseObservable {
         notifyPropertyChanged(BR.removeable);
     }
 
+    @Bindable
+    public boolean isVisiable() {
+        return isVisiable;
+    }
+
+    public void setVisiable(boolean visiable) {
+        isVisiable = visiable;
+        notifyPropertyChanged(BR.visiable);
+    }
+
     public AppInfo(String appLabel, Drawable appIconId, Intent intent, String pkgName) {
         this.appLabel = appLabel;
         this.appIconId = appIconId;
         this.intent = intent;
         this.pkgName = pkgName;
+    }
+
+    public AppInfo(String appLabel, Drawable appIconId, Intent intent, String pkgName, boolean isSystemApp, boolean removeable, boolean isVisiable) {
+        this.appLabel = appLabel;
+        this.appIconId = appIconId;
+        this.intent = intent;
+        this.pkgName = pkgName;
+        this.isSystemApp = isSystemApp;
+        this.removeable = removeable;
+        this.isVisiable = isVisiable;
+    }
+
+    public AppInfo(boolean isVisiable) {
+        this.isVisiable = isVisiable;
     }
 }

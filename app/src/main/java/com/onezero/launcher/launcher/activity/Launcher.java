@@ -4,7 +4,9 @@ import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,9 +40,10 @@ import com.onezero.launcher.launcher.view.PageIndicatorView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Launcher extends AppCompatActivity implements ITimeView, IAppContentView, PageRecyclerView.OnPagingListener, View.OnTouchListener {
+public class Launcher extends AppCompatActivity implements ITimeView, IAppContentView, PageRecyclerView.OnPagingListener {
 
     private PageRecyclerView appContent;
     private PageIndicatorView pageIndicator;
@@ -58,7 +61,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     private List<String> bottomAppsConfigs;
     private AppChangeReceiver appChangeReceiver;
     private IntentFilter appChangeFilter;
-    private List<AppInfo> appDataList;
+    private List<AppInfo> appDataList = new ArrayList<>();
     private int firstPageRows;
     private int hideCounts;
     private AllAppsPageAdapter appsContentAdapter;
@@ -73,15 +76,15 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         this.getWindow().setBackgroundDrawable(wallPaper);
         presenter = new LauncherPresenter(this, this);
         initViews();
+        if (!startApp) {
+            initData();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         presenter.updateTime();
-        if (!startApp) {
-            initData();
-        }
         initReceiver();
         if (appContent != null && appContent.getAdapter() != null) {
             appContent.gotoPage(currentPage);
@@ -89,10 +92,15 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     }
 
     private void initData() {
+        fullPageRows = getResources().getInteger(R.integer.full_page_rows);
+        columns = getResources().getInteger(R.integer.per_page_columens);
+        firstPageRows = getResources().getInteger(R.integer.first_page_rows);
+        hideCounts = (fullPageRows - firstPageRows) * columns;
         excludeAppsConfigs = DeviceConfig.getInstance(this).getExcludeAppsConfigs();
         bottomAppsConfigs = DeviceConfig.getInstance(this).getBottomAppsConfigs();
         presenter.setAppContentView(getPackageManager(), excludeAppsConfigs);
         presenter.setBottomContentView(getPackageManager(), bottomAppsConfigs);
+        AppInfoUtils.getDefaultDataList(appDataList, hideCounts);
     }
 
     private void initViews() {
@@ -101,11 +109,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         dateText = timeLayout.findViewById(R.id.launcher_date_text);
 
         appContent = findViewById(R.id.app_content_view);
-        fullPageRows = getResources().getInteger(R.integer.full_page_rows);
-        columns = getResources().getInteger(R.integer.per_page_columens);
-        firstPageRows = getResources().getInteger(R.integer.first_page_rows);
-        hideCounts = (fullPageRows - firstPageRows) * columns;
-
         pageIndicator = findViewById(R.id.page_indicator);
         bottomAppContent = findViewById(R.id.launcher_bottom_area);
     }
@@ -181,14 +184,14 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
      */
     @Override
     public void layoutAllAppsContent(final List<AppInfo> list) {
-        this.appDataList = list;
-        calculateIndicators(list);
+        Log.d("tag", "=======layoutAllAppsContent=========="+list.size());
+        appDataList.addAll(hideCounts, list);
+        calculateIndicators(appDataList);
         DisableScrollGridManager manager = new DisableScrollGridManager(Launcher.this);
         appContent.setLayoutManager(manager);
-        appsContentAdapter = new AllAppsPageAdapter(this, fullPageRows, columns, list, hideCounts);
+        appsContentAdapter = new AllAppsPageAdapter(this, fullPageRows, columns, appDataList, hideCounts);
         appContent.setAdapter(appsContentAdapter);
         appContent.setOnPagingListener(this);
-        appContent.setOnTouchListener(this);
     }
 
     private int calculateIndicators(List<AppInfo> list) {
@@ -196,12 +199,10 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         int firstPageRows = getResources().getInteger(R.integer.first_page_rows);
         int firstPageAppCount = columns * firstPageRows;
         int indicatorCount;
-        if (size <= firstPageAppCount) {
-            indicatorCount = 1;
-        } else if ((size - firstPageAppCount) % (fullPageRows * columns) == 0) {
-            indicatorCount = (size - firstPageAppCount) / (fullPageRows * columns);
+        if (size  % (fullPageRows * columns) == 0) {
+            indicatorCount = size / (fullPageRows * columns);
         } else {
-            indicatorCount = (size - firstPageAppCount) / (fullPageRows * columns) + 1 + 1;
+            indicatorCount = size / (fullPageRows * columns) + 1;
         }
         pageIndicator.initIndicator(indicatorCount);
         return indicatorCount;
@@ -229,8 +230,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Subscribe
     public void onPackageChanged(PackageChangedEvent event) {
         if (event.isNewAdd()) {
-            appDataList.add(AppInfoUtils.getAppInfoByPkgName(getPackageManager(), event.getPkgName()));
-
+            appDataList.add(appDataList.size(), AppInfoUtils.getAppInfoByPkgName(getPackageManager(), event.getPkgName()));
         }
         if (!event.isNewAdd()) {
             AppInfo info = null;
@@ -243,7 +243,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
             appDataList.remove(info);
         }
         int i = calculateIndicators(appDataList);
-        appsContentAdapter.notifyDataSetChanged();
+        appsContentAdapter.setDataList(appDataList);
     }
 
     @Override
@@ -255,16 +255,5 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
             timeLayout.setVisibility(View.GONE);
         }
         pageIndicator.setSelectedPage(currentPage);
-    }
-
-    @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-        if (view instanceof RecyclerView) {
-            if (motionEvent.getAction()== MotionEvent.ACTION_UP) {
-                appsContentAdapter.resetState();
-            }
-            return false;
-        }
-        return false;
     }
 }

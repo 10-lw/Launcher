@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.util.Log;
 
+import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.callback.QueryCallBack;
 
 import java.util.ArrayList;
@@ -78,6 +80,7 @@ public class AppInfoUtils {
 
             appInfo.setAppLabel((String) info.loadLabel(pm));
             appInfo.setPkgName(packageName);
+            appInfo.setVisiable(true);
             try {
                 boolean isSystemApp = ApplicationHelper.isSystemApp(pm.getPackageInfo(packageName, 0));
                 appInfo.setSystemApp(isSystemApp);
@@ -107,6 +110,7 @@ public class AppInfoUtils {
             appInfo.setAppLabel(label.toString());
             appInfo.setAppIconId(pm.getApplicationIcon(applicationInfo));
             appInfo.setRemoveable(false);
+            appInfo.setVisiable(true);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -116,6 +120,14 @@ public class AppInfoUtils {
     public static void resetAllAppRemoveableState(List<AppInfo> list) {
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setRemoveable(false);
+        }
+    }
+
+    public static void getDefaultDataList(List<AppInfo> appDataList, int hideCounts) {
+        for (int i = 0; i < hideCounts; i++) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                appDataList.add(new AppInfo(false));
+            }
         }
     }
 }
