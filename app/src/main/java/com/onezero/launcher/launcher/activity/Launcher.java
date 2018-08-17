@@ -238,7 +238,8 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         if (!event.isNewAdd()) {
             AppInfo info = null;
             for (int i = 0; i < appDataList.size(); i++) {
-                if (appDataList.get(i).getPkgName().equalsIgnoreCase(event.getPkgName())) {
+                String pkgName = appDataList.get(i).getPkgName();
+                if (pkgName != null && event.getPkgName().equalsIgnoreCase(pkgName)) {
                     info = appDataList.get(i);
                     break;
                 }
