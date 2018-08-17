@@ -4,14 +4,11 @@ import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -77,13 +74,22 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         presenter = new LauncherPresenter(this, this);
         initViews();
         if (!startApp) {
-            initData();
+            initConfigData();
         }
+    }
+
+    private void loadData() {
+        appDataList.clear();
+        AppInfoUtils.getDefaultDataList(appDataList, hideCounts);
+        presenter.setAppContentView(getPackageManager(), excludeAppsConfigs);
+        presenter.setBottomContentView(getPackageManager(), bottomAppsConfigs);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("=====", "=======onResume===========");
+        loadData();
         presenter.updateTime();
         initReceiver();
         if (appContent != null && appContent.getAdapter() != null) {
@@ -91,16 +97,13 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         }
     }
 
-    private void initData() {
+    private void initConfigData() {
         fullPageRows = getResources().getInteger(R.integer.full_page_rows);
         columns = getResources().getInteger(R.integer.per_page_columens);
         firstPageRows = getResources().getInteger(R.integer.first_page_rows);
         hideCounts = (fullPageRows - firstPageRows) * columns;
         excludeAppsConfigs = DeviceConfig.getInstance(this).getExcludeAppsConfigs();
         bottomAppsConfigs = DeviceConfig.getInstance(this).getBottomAppsConfigs();
-        presenter.setAppContentView(getPackageManager(), excludeAppsConfigs);
-        presenter.setBottomContentView(getPackageManager(), bottomAppsConfigs);
-        AppInfoUtils.getDefaultDataList(appDataList, hideCounts);
     }
 
     private void initViews() {
