@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -40,7 +41,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Launcher extends AppCompatActivity implements ITimeView, IAppContentView, PageRecyclerView.OnPagingListener {
+public class Launcher extends AppCompatActivity implements ITimeView, IAppContentView, PageRecyclerView.OnPagingListener, PageRecyclerView.OnTouchActionUpListener {
 
     private PageRecyclerView appContent;
     private PageIndicatorView pageIndicator;
@@ -195,6 +196,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         appsContentAdapter = new AllAppsPageAdapter(this, fullPageRows, columns, appDataList, hideCounts);
         appContent.setAdapter(appsContentAdapter);
         appContent.setOnPagingListener(this);
+        appContent.setOnTouchActionUpListener(this);
     }
 
     private int calculateIndicators(List<AppInfo> list) {
@@ -259,5 +261,12 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
             timeLayout.setVisibility(View.GONE);
         }
         pageIndicator.setSelectedPage(currentPage);
+    }
+
+    @Override
+    public void onTouchActionUp(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_UP) {
+            appsContentAdapter.resetState();
+        }
     }
 }

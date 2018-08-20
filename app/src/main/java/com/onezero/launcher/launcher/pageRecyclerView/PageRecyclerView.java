@@ -21,6 +21,7 @@ public class PageRecyclerView extends RecyclerView {
 
     private static final String TAG = PageRecyclerView.class.getSimpleName();
     private GPaginator paginator;
+    private OnTouchActionUpListener touchListener;
 
     public enum TouchDirection {Horizontal, Vertical}
 
@@ -35,6 +36,10 @@ public class PageRecyclerView extends RecyclerView {
 
     public interface OnPagingListener {
         void onPageChange(int position, int itemCount, int pageSize, int currentPage);
+    }
+
+    public interface OnTouchActionUpListener {
+        void onTouchActionUp(MotionEvent ev);
     }
 
     public interface OnChangeFocusListener {
@@ -212,6 +217,7 @@ public class PageRecyclerView extends RecyclerView {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        touchListener.onTouchActionUp(ev);
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 lastX = ev.getX();
@@ -242,6 +248,11 @@ public class PageRecyclerView extends RecyclerView {
     public void setOnPagingListener(OnPagingListener listener) {
         this.onPagingListener = listener;
     }
+
+    public void setOnTouchActionUpListener(OnTouchActionUpListener listener) {
+        this.touchListener = listener;
+    }
+
 
 
     public void prevPage() {

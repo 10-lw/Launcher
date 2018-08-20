@@ -28,6 +28,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
     private int hideCounts;
     private List<AppInfo> list;
     private boolean enterRemoveMode;
+    private AppInfoViewHolder longClickItem;
 
     /**
      * @param context
@@ -71,7 +72,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
     }
 
     @Override
-    public void onPageBindViewHolder(AppInfoViewHolder holder, final int position) {
+    public void onPageBindViewHolder(final AppInfoViewHolder holder, final int position) {
             final AppInfo appInfo = list.get(position);
             final boolean isSystemApp = appInfo.isSystemApp();
             AppInfoItemBinding binding = holder.getDatabinding();
@@ -96,7 +97,8 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
                         return true;
                     }
                     enterRemoveMode = true;
-                    appInfo.setRemoveable(true);
+                    longClickItem = holder;
+                    holder.removeIcon.setVisibility(View.VISIBLE);
                     return true;
                 }
             });
@@ -106,7 +108,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
                 public void onClick(View view) {
                     enterRemoveMode = false;
                     EventBus.getDefault().post(new OnAppItemRemoveClickEvent(appInfo));
-                    appInfo.setRemoveable(false);
+                    longClickItem.removeIcon.setVisibility(View.GONE);
                     notifyItemChanged(position);
                 }
             });
@@ -114,7 +116,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
 
     public boolean resetState() {
         if (enterRemoveMode) {
-            AppInfoUtils.resetAllAppRemoveableState(list);
+            longClickItem.removeIcon.setVisibility(View.GONE);
             return true;
         } else {
             return false;

@@ -81,6 +81,7 @@ public class AppInfoUtils {
             appInfo.setAppLabel((String) info.loadLabel(pm));
             appInfo.setPkgName(packageName);
             appInfo.setVisiable(true);
+            appInfo.setRemoveable(false);
             try {
                 boolean isSystemApp = ApplicationHelper.isSystemApp(pm.getPackageInfo(packageName, 0));
                 appInfo.setSystemApp(isSystemApp);
@@ -117,16 +118,10 @@ public class AppInfoUtils {
         return appInfo;
     }
 
-    public static void resetAllAppRemoveableState(List<AppInfo> list) {
-        for (int i = 0; i < list.size(); i++) {
-            list.get(i).setRemoveable(false);
-        }
-    }
-
     public static void getDefaultDataList(List<AppInfo> appDataList, int hideCounts) {
         for (int i = 0; i < hideCounts; i++) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                appDataList.add(new AppInfo(false));
+                appDataList.add(new AppInfo(false, false));
             }
         }
     }

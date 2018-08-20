@@ -53,7 +53,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:clickable="true"
-            android:visibility="@{info.removeable ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="gone"
             android:src="@mipmap/remove"/>
 
     </RelativeLayout>

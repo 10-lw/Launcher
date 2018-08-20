@@ -107,7 +107,8 @@ public class AppInfo extends BaseObservable {
         this.isVisiable = isVisiable;
     }
 
-    public AppInfo(boolean isVisiable) {
+    public AppInfo(boolean isVisiable, boolean removeable) {
         this.isVisiable = isVisiable;
+        this.removeable = removeable;
     }
 }
