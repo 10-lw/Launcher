@@ -2,6 +2,7 @@ package com.onezero.launcher.launcher.presenter;
 
 import android.content.pm.PackageManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
@@ -62,7 +63,9 @@ public class LauncherPresenter implements ITimePresenter, IAppManagerPresenter {
         if (bottomAppsConfigs != null) {
             for (int i = 0; i < bottomAppsConfigs.size(); i++) {
                 AppInfo appInfo = AppInfoUtils.getAppInfoByPkgName(pm, bottomAppsConfigs.get(i));
-                bottomAppInfos.add(appInfo);
+                if (appInfo.getIntent() != null) {
+                    bottomAppInfos.add(appInfo);
+                }
             }
         }
         appView.layoutBottomAppContent(bottomAppInfos);
