@@ -64,6 +64,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     private int hideCounts;
     private AllAppsPageAdapter appsContentAdapter;
     private boolean startApp = false;
+    private long lastTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,10 +81,21 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     }
 
     private void loadData() {
+        if (checkInMillTime()) {
+            return;
+        }
         appDataList.clear();
         AppInfoUtils.getDefaultDataList(appDataList, hideCounts);
         presenter.setAppContentView(getPackageManager(), excludeAppsConfigs);
         presenter.setBottomContentView(getPackageManager(), bottomAppsConfigs);
+    }
+
+    private boolean checkInMillTime() {
+        if (System.currentTimeMillis() - lastTime < 500) {
+            return true;
+        }
+        lastTime = System.currentTimeMillis();
+        return false;
     }
 
     @Override
@@ -93,9 +105,11 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         loadData();
         presenter.updateTime();
         initReceiver();
-        if (appContent != null && appContent.getAdapter() != null) {
-            appContent.gotoPage(currentPage);
-        }
+//        if (appContent != null && appContent.getAdapter() != null) {
+//            appContent.gotoPage(currentPage);
+//        } else {
+//            loadData();
+//        }
     }
 
     private void initConfigData() {
@@ -115,6 +129,9 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         appContent = findViewById(R.id.app_content_view);
         pageIndicator = findViewById(R.id.page_indicator);
         bottomAppContent = findViewById(R.id.launcher_bottom_area);
+
+        appContent.setOnPagingListener(this);
+        appContent.setOnTouchActionUpListener(this);
     }
 
     @Override
@@ -195,8 +212,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         appContent.setLayoutManager(manager);
         appsContentAdapter = new AllAppsPageAdapter(this, fullPageRows, columns, appDataList, hideCounts);
         appContent.setAdapter(appsContentAdapter);
-        appContent.setOnPagingListener(this);
-        appContent.setOnTouchActionUpListener(this);
+        appContent.gotoPage(currentPage);
     }
 
     private int calculateIndicators(List<AppInfo> list) {
@@ -265,7 +281,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
 
     @Override
     public void onTouchActionUp(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_UP) {
+        if (ev.getAction() == MotionEvent.ACTION_UP && appsContentAdapter != null) {
             appsContentAdapter.resetState();
         }
     }
