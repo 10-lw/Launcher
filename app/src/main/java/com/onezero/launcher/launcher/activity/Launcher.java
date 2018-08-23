@@ -65,11 +65,23 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     private AllAppsPageAdapter appsContentAdapter;
     private boolean startApp = false;
     private long lastTime = 0;
+    private boolean hasResumed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
+        Log.d("tag", "=============onCreate=");
+        if(!this.isTaskRoot()) { //判断该Activity是不是任务空间的源Activity，“非”也就是说是被系统重新实例化出来
+            //如果你就放在launcher Activity中话，这里可以直接return了
+            Intent mainIntent=getIntent();
+            String action=mainIntent.getAction();
+            if(mainIntent.hasCategory(Intent.CATEGORY_LAUNCHER) && action.equals(Intent.ACTION_MAIN)) {
+                finish();
+                return;//finish()之后该活动会继续执行后面的代码，你可以logCat验证，加return避免可能的exception
+            }
+        }
+
         //设置系统桌面为背景
         Drawable wallPaper = WallpaperManager.getInstance(this).getDrawable();
         this.getWindow().setBackgroundDrawable(wallPaper);
@@ -101,7 +113,12 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("=====", "=======onResume===========");
+        Log.d("=====", "=======onResume====9999=======");
+        if (hasResumed) {
+            return;
+        }
+        Log.d("=====", "=======onResume====8888=======");
+        hasResumed = true;
         loadData();
         presenter.updateTime();
         initReceiver();
@@ -147,6 +164,8 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("=====", "=======onPause====8888=======");
+        hasResumed = false;
         if (dateReceiver != null) {
             unregisterReceiver(dateReceiver);
             dateReceiver = null;

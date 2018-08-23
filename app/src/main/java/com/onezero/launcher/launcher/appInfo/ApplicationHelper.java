@@ -3,6 +3,7 @@ package com.onezero.launcher.launcher.appInfo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.util.Log;
@@ -31,7 +32,9 @@ public class ApplicationHelper {
 
     private static void startActivitySafely(Context context, AppInfo info) {
         try {
-            context.startActivity(info.getIntent());
+            Intent intent = info.getIntent();
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
         } catch (Exception e) {
             Log.e(TAG, "start activity error,the intent is:" + info.getIntent().toString());
             e.printStackTrace();
