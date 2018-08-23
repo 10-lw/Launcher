@@ -117,7 +117,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         if (hasResumed) {
             return;
         }
-        Log.d("=====", "=======onResume====8888=======");
         hasResumed = true;
         loadData();
         presenter.updateTime();
@@ -164,7 +163,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("=====", "=======onPause====8888=======");
+        Log.d("=====", "=======onPause===========");
         hasResumed = false;
         if (dateReceiver != null) {
             unregisterReceiver(dateReceiver);
@@ -179,6 +178,25 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("=====", "=======onStop===========");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("=====", "=======onStart===========");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("=====", "=======onDestroy===========");
     }
 
     @Override
