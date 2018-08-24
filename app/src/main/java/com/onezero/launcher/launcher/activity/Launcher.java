@@ -151,7 +151,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
 
     @Override
     public void onBackPressed() {
-        if (!appsContentAdapter.resetState()) {
+        if (appsContentAdapter != null && !appsContentAdapter.resetState()) {
             ToastUtils.showToast(this, R.string.have_been_to_desktop);
         }
     }

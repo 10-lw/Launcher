@@ -18,6 +18,7 @@
             android:name=".activity.MainActivity"
             android:alwaysRetainTaskState="true"
             android:theme="@style/LauncherActivityTheme"
+            android:screenOrientation="portrait"
             android:launchMode="standard">
             <intent-filter>
                 <category android:name="android.intent.category.HOME" />
@@ -35,6 +36,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize|locale|screenLayout|mcc|mnc|navigation"
             android:enabled="true"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:resumeWhilePausing="true"
             android:theme="@style/LauncherActivityTheme">
             <intent-filter>
