@@ -1,4 +1,4 @@
 {
-  "confirm_apps_on_launcher_bottom": ["com.android.browser", "com.android.settings"],
+  "confirm_apps_on_launcher_bottom": ["com.android.browser", "com.android.settings", "com.android.documentsui"],
   "do_not_show_apps":["com.onezero.launcher.launcher", "com.android.inputmethod.latin", "com.sohu.inputmethod.sogou"]
 }

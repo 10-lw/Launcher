@@ -218,6 +218,9 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
 
     @Override
     public void layoutBottomAppContent(List<AppInfo> list) {
+        if(list == null || list.size() == 0) {
+            return;
+        }
         BottomRecyclerViewAdapter bottomRecyclerViewAdapter = new BottomRecyclerViewAdapter(this, list);
         bottomAppContent.setAdapter(bottomRecyclerViewAdapter);
         bottomAppContent.setLayoutManager(new GridLayoutManager(this, list.size()));
