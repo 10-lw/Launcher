@@ -6,7 +6,6 @@
 
     <application
         android:allowBackup="true"
-        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
@@ -17,16 +16,20 @@
         <activity
             android:name=".activity.MainActivity"
             android:alwaysRetainTaskState="true"
-            android:theme="@style/LauncherActivityTheme"
+            android:enabled="true"
+            android:hardwareAccelerated="false"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true"
+            android:configChanges="keyboardHidden|orientation|screenSize|locale|screenLayout|mcc|mnc|navigation"
+            android:launchMode="standard"
             android:screenOrientation="portrait"
-            android:launchMode="standard">
-            <intent-filter>
-                <category android:name="android.intent.category.HOME" />
-                <category android:name="android.intent.category.LAUNCHER" />
-
+            android:theme="@style/LauncherActivityTheme">
+            <intent-filter android:priority="2000">
                 <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.MONKEY"/>
+                <category android:name="android.intent.category.MONKEY" />
             </intent-filter>
         </activity>
         <activity android:name=".activity.UnitTestActivity" />
@@ -36,8 +39,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize|locale|screenLayout|mcc|mnc|navigation"
             android:enabled="true"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:resumeWhilePausing="true"
+            android:screenOrientation="portrait"
             android:theme="@style/LauncherActivityTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
