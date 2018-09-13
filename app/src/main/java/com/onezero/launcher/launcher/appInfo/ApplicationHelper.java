@@ -9,6 +9,7 @@ import android.content.pm.PackageInfo;
 import android.util.Log;
 
 import com.onezero.launcher.launcher.R;
+import com.onezero.launcher.launcher.utils.ToastUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class ApplicationHelper {
         return (!isSystemApp(pInfo) && !isSystemUpdateApp(pInfo));
     }
 
-    public static void performUninstallApp(Context context, AppInfo info) {
+    public static void performUninstallApp(final Context context, AppInfo info) {
         final String pkgName = info.getPkgName();
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setMessage(R.string.remove_app_confirm)
@@ -119,7 +120,11 @@ public class ApplicationHelper {
                     @Override
                     public void onNext(Boolean b) {
                         result = b;
-                        Log.d(TAG, "Client uninstalled successful!");
+                        if (b){
+                            Log.d(TAG, "Client uninstalled successful!");
+                        } else {
+                            Log.e(TAG, "Client uninstalled error!");
+                        }
                     }
 
                     @Override
