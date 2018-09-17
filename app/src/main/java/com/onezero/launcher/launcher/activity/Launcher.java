@@ -1,9 +1,7 @@
 package com.onezero.launcher.launcher.activity;
 
-import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -70,8 +68,12 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
         //设置系统桌面为背景
-        Drawable wallPaper = WallpaperManager.getInstance(this).getDrawable();
-        this.getWindow().setBackgroundDrawable(wallPaper);
+//        Drawable wallPaper = WallpaperManager.getInstance(this).getDrawable();
+//        if (wallPaper == null) {
+//            Log.d("tag", "======wallPaper == null ==============");
+//        }
+//        this.getWindow().setBackgroundDrawable(wallPaper);
+        getWindow().setBackgroundDrawableResource(R.mipmap.wallpaper);
         presenter = new LauncherPresenter(this, this);
         initViews();
         if (!startApp) {
