@@ -78,7 +78,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
             AppInfoItemBinding binding = holder.getDatabinding();
             binding.setVariable(BR.info, appInfo);
 
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
+            holder.itemLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if(enterRemoveMode) {
@@ -89,7 +89,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
                 }
             });
 
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            holder.itemLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
                     if (isSystemApp) {
