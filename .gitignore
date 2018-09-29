@@ -16,3 +16,4 @@ gen/
 gradlew.bat
 gradlew
 gradle/
+.svn/
