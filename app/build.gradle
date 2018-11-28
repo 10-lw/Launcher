@@ -4,6 +4,11 @@ def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+
+def gitGitVersionCode() {
+    return 'git rev-list HEAD --first-parent --count'.execute().text.trim().toInteger()
+}
+
 android {
     signingConfigs {
         release {
@@ -19,8 +24,8 @@ android {
         applicationId "com.onezero.launcher.launcher"
         minSdkVersion 20
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode gitGitVersionCode()
+        versionName "arm_v"+versionCode
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
