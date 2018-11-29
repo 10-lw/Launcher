@@ -5,9 +5,6 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 
-def gitGitVersionCode() {
-    return 'git rev-list HEAD --first-parent --count'.execute().text.trim().toInteger()
-}
 
 android {
     signingConfigs {
@@ -24,7 +21,7 @@ android {
         applicationId "com.onezero.launcher.launcher"
         minSdkVersion 20
         targetSdkVersion 21
-        versionCode gitGitVersionCode()
+        versionCode getAppVersionCode()
         versionName "arm_v"+versionCode
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
