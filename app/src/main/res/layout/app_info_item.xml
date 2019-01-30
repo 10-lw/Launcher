@@ -42,6 +42,7 @@
                 android:layout_gravity="center_horizontal"
                 android:ellipsize="end"
                 android:maxLines="1"
+                android:paddingTop="@dimen/label_padding_top"
                 android:gravity="center_horizontal|top"
                 android:text="@{info.appLabel}"
                 android:textColor="@android:color/white"

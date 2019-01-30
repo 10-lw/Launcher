@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">Launcher</string>
-    <string name="can_not_remove_system_app">System application can\'t be removed.</string>
-    <string name="remove_app_confirm">Do you want remove this application?</string>
-    <string name="ok">Yes</string>
-    <string name="cancel">Cancel</string>
-    <string name="have_been_to_desktop">Have been desktop!</string>
-    <string name="uninstall_fail">Uninstall application failed.</string>
-    <string name="uninstall_success">Uninstall application successfully.</string>
+    <string name="app_name">云手机桌面</string>
+    <string name="can_not_remove_system_app">不能卸载系统应用</string>
+    <string name="remove_app_confirm">是否要卸载此应用</string>
+    <string name="ok">是</string>
+    <string name="cancel">取消</string>
+    <string name="have_been_to_desktop">已经到云手机桌面!</string>
+    <string name="uninstall_fail">卸载应用失败.</string>
+    <string name="uninstall_success">卸载应用成功.</string>
 </resources>
