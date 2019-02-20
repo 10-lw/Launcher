@@ -3,10 +3,10 @@
     <dimen name="launcher_week_text_size">20sp</dimen>
     <dimen name="launcher_time_layout_min_height">140dp</dimen>
     <dimen name="launcher_text_clock_text_size">36sp</dimen>
-    <dimen name="launcher_time_padding">30dp</dimen>
+    <dimen name="launcher_time_padding">20dp</dimen>
     <dimen name="launcher_time_padding_top">20dp</dimen>
     <dimen name="launcher_app_icon_size">56dp</dimen>
-    <dimen name="launcher_app_label_text_size">12sp</dimen>
+    <dimen name="launcher_app_label_text_size">10sp</dimen>
     <dimen name="label_padding_top">4dp</dimen>
     <dimen name="app_content_margin_top">15dp</dimen>
 </resources>
