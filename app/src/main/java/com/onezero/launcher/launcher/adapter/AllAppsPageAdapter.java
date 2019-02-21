@@ -11,6 +11,7 @@ import com.android.databinding.library.baseAdapters.BR;
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
+import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
 import com.onezero.launcher.launcher.databinding.AppInfoItemBinding;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
@@ -85,6 +86,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
                         resetState();
                         enterRemoveMode = false;
                     }
+                    ApplicationHelper.performStartApp(mContext, appInfo);
                     EventBus.getDefault().post(new OnAppItemClickEvent(appInfo));
                 }
             });

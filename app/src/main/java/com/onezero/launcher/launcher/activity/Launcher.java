@@ -232,7 +232,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Subscribe
     public void onItemClick(OnAppItemClickEvent event) {
         startApp = true;
-        ApplicationHelper.performStartApp(this, event.getInfo());
+//        ApplicationHelper.performStartApp(this, event.getInfo());
     }
 
     @Subscribe

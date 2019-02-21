@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.onezero.launcher.launcher.BR;
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
 import com.onezero.launcher.launcher.databinding.AppInfoItemBinding;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 
@@ -42,6 +43,7 @@ public class BottomRecyclerViewAdapter extends RecyclerView.Adapter<AppInfoViewH
         holder.itemLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ApplicationHelper.performStartApp(mContext, appInfo);
                 EventBus.getDefault().post(new OnAppItemClickEvent(appInfo));
             }
         });
