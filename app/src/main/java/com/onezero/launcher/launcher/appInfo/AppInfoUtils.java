@@ -8,7 +8,6 @@ import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.util.Log;
 
-import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.callback.QueryCallBack;
 
 import java.util.ArrayList;
@@ -51,6 +50,53 @@ public class AppInfoUtils {
                         callBack.querySuccessful(list);
                     }
                 });
+    }
+
+    @SuppressLint("CheckResult")
+    public static void queryBottomAppInfoTask(final PackageManager pm, final List<String> bottomAppsConfigs, final QueryCallBack callBack) {
+        Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
+                List<AppInfo> list = queryBottomAppInfo(pm, bottomAppsConfigs);
+
+                if (list != null) {
+                    emitter.onNext(list);
+                } else {
+                    emitter.onNext(new ArrayList<AppInfo>());
+                }
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<AppInfo>>() {
+                    @Override
+                    public void accept(List<AppInfo> list) throws Exception {
+                        callBack.querySuccessful(list);
+                    }
+                });
+    }
+
+    public synchronized static List<AppInfo> queryBottomAppInfo(PackageManager pm, List<String> bottomAppsConfigs) {
+        List<AppInfo> bottomAppInfos = new ArrayList<>();
+        ArrayList<String> installedPkg = new ArrayList<>();
+        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> resolveInfoList = pm.queryIntentActivities(mainIntent, 0);
+        for (int i = 0; i < resolveInfoList.size(); i++) {
+            ResolveInfo info = resolveInfoList.get(i);
+            String packageName = info.activityInfo.packageName;
+            installedPkg.add(packageName);
+        }
+
+        for (int i = 0; i < bottomAppsConfigs.size(); i++) {
+            String s = bottomAppsConfigs.get(i);
+            if (installedPkg.contains(s)) {
+                AppInfo appInfo = AppInfoUtils.getAppInfoByPkgName(pm, s);
+                if (appInfo.getIntent() != null) {
+                    bottomAppInfos.add(appInfo);
+                }
+            }
+        }
+        return bottomAppInfos;
     }
 
     public synchronized static List<AppInfo> queryAllAppInfo(PackageManager pm, List<String> excludeList) {

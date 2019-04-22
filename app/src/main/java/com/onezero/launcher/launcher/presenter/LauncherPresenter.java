@@ -1,8 +1,9 @@
 package com.onezero.launcher.launcher.presenter;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
@@ -12,6 +13,7 @@ import com.onezero.launcher.launcher.view.IAppContentView;
 import com.onezero.launcher.launcher.view.ITimeView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -59,15 +61,11 @@ public class LauncherPresenter implements ITimePresenter, IAppManagerPresenter {
 
     @Override
     public void setBottomContentView(PackageManager pm, List<String> bottomAppsConfigs) {
-        List<AppInfo> bottomAppInfos = new ArrayList<>();
-        if (bottomAppsConfigs != null) {
-            for (int i = 0; i < bottomAppsConfigs.size(); i++) {
-                AppInfo appInfo = AppInfoUtils.getAppInfoByPkgName(pm, bottomAppsConfigs.get(i));
-                if (appInfo.getIntent() != null) {
-                    bottomAppInfos.add(appInfo);
-                }
+        AppInfoUtils.queryBottomAppInfoTask(pm, bottomAppsConfigs, new QueryCallBack() {
+            @Override
+            public void querySuccessful(List<AppInfo> list) {
+                appView.layoutBottomAppContent(list);
             }
-        }
-        appView.layoutBottomAppContent(bottomAppInfos);
+        });
     }
 }
