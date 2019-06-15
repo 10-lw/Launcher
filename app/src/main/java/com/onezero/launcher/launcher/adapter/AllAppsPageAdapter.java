@@ -1,5 +1,6 @@
 package com.onezero.launcher.launcher.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.util.Log;
@@ -10,24 +11,26 @@ import android.view.ViewGroup;
 import com.android.databinding.library.baseAdapters.BR;
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
-import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
 import com.onezero.launcher.launcher.databinding.AppInfoItemBinding;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
+import com.onezero.launcher.launcher.model.LauncherItemModel;
+import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
 import com.onezero.launcher.launcher.pageRecyclerView.PageRecyclerView;
-import com.onezero.launcher.launcher.utils.ToastUtils;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Collections;
 import java.util.List;
 
-public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoViewHolder> {
+public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoViewHolder> implements ItemTouchHelperAdapter {
     private Context mContext;
     private int fullPageRows;
     private int columns;
     private int hideCounts;
-    private List<AppInfo> list;
+    private List<AppInfo> list = null;
     private boolean enterRemoveMode;
     private AppInfoViewHolder longClickItem;
 
@@ -72,9 +75,11 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
         return new AppInfoViewHolder(dataBinding);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onPageBindViewHolder(final AppInfoViewHolder holder, final int position) {
             final AppInfo appInfo = list.get(position);
+            saveToDb(appInfo, position);
             final boolean isSystemApp = appInfo.isSystemApp();
             AppInfoItemBinding binding = holder.getDatabinding();
             binding.setVariable(BR.info, appInfo);
@@ -94,8 +99,9 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
             holder.itemLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
+
                     if (isSystemApp) {
-                        ToastUtils.showToast(mContext, R.string.can_not_remove_system_app);
+//                        ToastUtils.showToast(mContext, R.string.can_not_remove_system_app);
                         return true;
                     }
                     enterRemoveMode = true;
@@ -116,6 +122,14 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
             });
     }
 
+    private void saveToDb(AppInfo appInfo, int position) {
+        LauncherItemModel model = new LauncherItemModel();
+        model.appLabel = appInfo.getAppLabel();
+        model.apkPkg = appInfo.getPkgName();
+        model.position = position;
+        model.save();
+    }
+
     public boolean resetState() {
         if (enterRemoveMode) {
             longClickItem.removeIcon.setVisibility(View.GONE);
@@ -123,5 +137,46 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        if (toPosition <= hideCounts -1) {
+            toPosition = hideCounts;
+        } else if(toPosition >= getDataCount()) {
+            toPosition = getDataCount() -1;
+        }
+
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                exchange(list, i, i+1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                int j = i - 1;
+                exchange(list, i, j);
+            }
+
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    private void exchange(List<AppInfo> list, int fromPosition, int toPosition) {
+        AppInfo fromInfo = list.get(fromPosition);
+        AppInfo toInfo = list.get(toPosition);
+        LauncherItemModel model = new LauncherItemModel();
+        model.apkPkg = fromInfo.getPkgName();
+        model.position = toPosition;
+        model.appLabel= fromInfo.getAppLabel();
+        fromInfo.setPosition(toPosition);
+        model.save();
+
+        model.apkPkg = toInfo.getPkgName();
+        model.position = fromPosition;
+        model.appLabel= toInfo.getAppLabel();
+        toInfo.setPosition(fromPosition);
+        model.save();
+
+        Collections.swap(list, fromPosition, toPosition);
     }
 }

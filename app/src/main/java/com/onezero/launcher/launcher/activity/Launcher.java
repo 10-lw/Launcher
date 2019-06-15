@@ -2,10 +2,12 @@ package com.onezero.launcher.launcher.activity;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.onezero.launcher.launcher.DateReceiver;
 import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.AllAppsPageAdapter;
 import com.onezero.launcher.launcher.adapter.BottomRecyclerViewAdapter;
+import com.onezero.launcher.launcher.adapter.SimpleItemTouchHelperCallback;
 import com.onezero.launcher.launcher.appInfo.AppChangeReceiver;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
@@ -23,6 +26,8 @@ import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.event.PackageChangedEvent;
+import com.onezero.launcher.launcher.model.LauncherItemModel;
+import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
 import com.onezero.launcher.launcher.pageRecyclerView.DisableScrollGridManager;
 import com.onezero.launcher.launcher.pageRecyclerView.PageRecyclerView;
 import com.onezero.launcher.launcher.presenter.LauncherPresenter;
@@ -32,15 +37,18 @@ import com.onezero.launcher.launcher.utils.ToastUtils;
 import com.onezero.launcher.launcher.view.IAppContentView;
 import com.onezero.launcher.launcher.view.ITimeView;
 import com.onezero.launcher.launcher.view.PageIndicatorView;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Launcher extends AppCompatActivity implements ITimeView, IAppContentView, PageRecyclerView.OnPagingListener, PageRecyclerView.OnTouchActionUpListener {
 
+    private String TAG = "Launcher";
     private PageRecyclerView appContent;
     private PageIndicatorView pageIndicator;
     private RecyclerView bottomAppContent;
@@ -62,6 +70,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     private int hideCounts;
     private AllAppsPageAdapter appsContentAdapter;
     private boolean startApp = false;
+    private ItemTouchHelper touchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +85,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         getWindow().setBackgroundDrawableResource(R.mipmap.wallpaper);
         presenter = new LauncherPresenter(this, this);
         initViews();
-        if (!startApp) {
-            initConfigData();
-        }
     }
 
     private void loadData() {
@@ -91,14 +97,10 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Override
     protected void onResume() {
         super.onResume();
+        initConfigData();
         loadData();
         presenter.updateTime();
         initReceiver();
-//        if (appContent != null && appContent.getAdapter() != null) {
-//            appContent.gotoPage(currentPage);
-//        } else {
-//            loadData();
-//        }
     }
 
     private void initConfigData() {
@@ -152,6 +154,12 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
+    }
+
+    @Override
     public void onBackPressed() {
         if (appsContentAdapter != null && !appsContentAdapter.resetState()) {
             ToastUtils.showToast(this, R.string.have_been_to_desktop);
@@ -199,9 +207,18 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         calculateIndicators(appDataList);
         DisableScrollGridManager manager = new DisableScrollGridManager(Launcher.this);
         appContent.setLayoutManager(manager);
+        Collections.sort(appDataList);
         appsContentAdapter = new AllAppsPageAdapter(this, fullPageRows, columns, appDataList, hideCounts);
         appContent.setAdapter(appsContentAdapter);
         appContent.gotoPage(currentPage);
+        appContent.setHasFixedSize(true);
+
+        SimpleItemTouchHelperCallback helperCallback = new SimpleItemTouchHelperCallback(appsContentAdapter, this);
+        helperCallback.setTouchListener(appContent);
+        //用Callback构造ItemtouchHelper
+        touchHelper = new ItemTouchHelper(helperCallback);
+        //调用ItemTouchHelper的attachToRecyclerView方法建立联系
+        touchHelper.attachToRecyclerView(appContent);
     }
 
     private int calculateIndicators(List<AppInfo> list) {
@@ -243,7 +260,15 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Subscribe
     public void onPackageChanged(PackageChangedEvent event) {
         if (event.isNewAdd()) {
-            appDataList.add(appDataList.size(), AppInfoUtils.getAppInfoByPkgName(getPackageManager(), event.getPkgName()));
+            AppInfo info = AppInfoUtils.getAppInfoByPkgName(getPackageManager(), event.getPkgName());
+
+            LauncherItemModel model = new LauncherItemModel();
+            model.position = appDataList.size();
+            model.apkPkg = info.getPkgName();
+            model.appLabel = info.getAppLabel();
+            model.save();
+
+            appDataList.add(appDataList.size(), info);
         }
         if (!event.isNewAdd()) {
             AppInfo info = null;
@@ -254,6 +279,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
                     break;
                 }
             }
+            SQLite.delete().from(LauncherItemModel.class).where(LauncherItemModel_Table.apkPkg.eq(event.getPkgName())).execute();
             appDataList.remove(info);
         }
         int i = calculateIndicators(appDataList);

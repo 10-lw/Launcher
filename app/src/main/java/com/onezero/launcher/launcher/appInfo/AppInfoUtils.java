@@ -9,6 +9,11 @@ import android.os.Build;
 import android.util.Log;
 
 import com.onezero.launcher.launcher.callback.QueryCallBack;
+import com.onezero.launcher.launcher.model.LauncherItemModel;
+import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.sql.language.Where;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -128,6 +133,15 @@ public class AppInfoUtils {
             appInfo.setPkgName(packageName);
             appInfo.setVisiable(true);
             appInfo.setRemoveable(false);
+
+            Where<LauncherItemModel> where = new Select(LauncherItemModel_Table.position).from(LauncherItemModel.class).where(LauncherItemModel_Table.apkPkg.eq(packageName));
+            LauncherItemModel model = where.querySingle();
+            if (model != null) {
+                appInfo.setPosition(model.position);
+            } else {
+                appInfo.setPosition(resolveInfoList.size());
+            }
+
             try {
                 boolean isSystemApp = ApplicationHelper.isSystemApp(pm.getPackageInfo(packageName, 0));
                 appInfo.setSystemApp(isSystemApp);
@@ -167,7 +181,7 @@ public class AppInfoUtils {
     public static void getDefaultDataList(List<AppInfo> appDataList, int hideCounts) {
         for (int i = 0; i < hideCounts; i++) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                appDataList.add(new AppInfo(false, false));
+                appDataList.add(new AppInfo(false, false,"nullPkg "+i, i));
             }
         }
     }

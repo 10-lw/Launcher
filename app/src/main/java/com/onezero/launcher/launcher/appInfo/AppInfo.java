@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.onezero.launcher.launcher.BR;
@@ -12,7 +13,7 @@ import com.onezero.launcher.launcher.BR;
  * Created by lizeiwei on 2018/7/28.
  */
 
-public class AppInfo extends BaseObservable {
+public class AppInfo extends BaseObservable implements Comparable<AppInfo> {
     private String appLabel;    //应用程序标签
     private Drawable appIconId ;  //应用程序图像
     private Intent intent ;     //启动应用程序的Intent ，一般是Action为Main和Category为Lancher的Activity
@@ -20,6 +21,15 @@ public class AppInfo extends BaseObservable {
     private boolean isSystemApp;
     private boolean removeable;
     private boolean isVisiable;
+    private Integer position;
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 
     @Bindable
     public String getAppLabel() {
@@ -107,8 +117,15 @@ public class AppInfo extends BaseObservable {
         this.isVisiable = isVisiable;
     }
 
-    public AppInfo(boolean isVisiable, boolean removeable) {
+    public AppInfo(boolean isVisiable, boolean removeable, String pkgName,int position) {
         this.isVisiable = isVisiable;
         this.removeable = removeable;
+        this.position = position;
+        this.pkgName = pkgName;
+    }
+
+    @Override
+    public int compareTo(@NonNull AppInfo info) {
+        return this.position.compareTo(info.getPosition());
     }
 }

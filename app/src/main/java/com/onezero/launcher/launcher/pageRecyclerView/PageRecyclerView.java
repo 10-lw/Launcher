@@ -14,14 +14,22 @@ import android.widget.AbsListView;
 
 import com.onezero.launcher.launcher.view.PageTurningSimpleDirection;
 
-import java.util.Hashtable;
-import java.util.Map;
-
-public class PageRecyclerView extends RecyclerView {
+public class PageRecyclerView extends RecyclerView implements ItemTouchListenser {
 
     private static final String TAG = PageRecyclerView.class.getSimpleName();
     private GPaginator paginator;
     private OnTouchActionUpListener touchListener;
+    private volatile boolean onSwap = false;
+
+    @Override
+    public void onSelectedChanged() {
+        onSwap = true;
+    }
+
+    @Override
+    public void clearView() {
+        onSwap = false;
+    }
 
     public enum TouchDirection {Horizontal, Vertical}
 
@@ -218,6 +226,9 @@ public class PageRecyclerView extends RecyclerView {
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         touchListener.onTouchActionUp(ev);
+        if (onSwap) {
+            return super.onTouchEvent(ev);
+        }
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 lastX = ev.getX();
