@@ -6,7 +6,7 @@
     <dimen name="launcher_time_padding">20dp</dimen>
     <dimen name="launcher_time_padding_top">20dp</dimen>
     <dimen name="launcher_app_icon_size">56dp</dimen>
-    <dimen name="launcher_app_label_text_size">10sp</dimen>
+    <dimen name="launcher_app_label_text_size">9sp</dimen>
     <dimen name="label_padding_top">4dp</dimen>
     <dimen name="app_content_margin_top">15dp</dimen>
 </resources>
