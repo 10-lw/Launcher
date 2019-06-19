@@ -14,6 +14,7 @@ public class AppInfoViewHolder extends RecyclerView.ViewHolder {
     private AppInfoItemBinding databinding;
 
     public ImageView removeIcon;
+    public ImageView installIcon;
     public TextView label;
 
     public AppInfoViewHolder(AppInfoItemBinding databinding) {
@@ -22,6 +23,7 @@ public class AppInfoViewHolder extends RecyclerView.ViewHolder {
         removeIcon = databinding.getRoot().findViewById(R.id.app_info_remove);
         label = databinding.getRoot().findViewById(R.id.launcher_app_label);
         itemLayout = databinding.getRoot().findViewById(R.id.item_layout);
+        installIcon = databinding.getRoot().findViewById(R.id.app_info_install);
     }
 
     public AppInfoItemBinding getDatabinding() {

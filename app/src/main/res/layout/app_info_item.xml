@@ -16,24 +16,33 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:visibility="@{info.isVisiable ? View.VISIBLE : View.INVISIBLE}"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="@{info.isVisiable ? View.VISIBLE : View.INVISIBLE}">
 
         <LinearLayout
             android:id="@+id/item_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:gravity="center"
             android:clickable="true"
+            android:gravity="center"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/launcher_app_icon"
-                app:loadDrawable="@{info.appIconId}"
                 android:layout_width="@dimen/launcher_app_icon_size"
                 android:layout_height="@dimen/launcher_app_icon_size"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal"
+                android:visibility="@{info.isVirtuallApp ? View.GONE : View.VISIBLE}"
+                app:loadDrawable="@{info.appIconId}" />
+
+            <ImageView
+                android:id="@+id/launcher_app_icon_virtual"
+                android:layout_width="@dimen/launcher_app_icon_size"
+                android:layout_height="@dimen/launcher_app_icon_size"
+                android:layout_gravity="center_horizontal"
+                android:visibility="@{info.isVirtuallApp ? View.VISIBLE : View.GONE}"
+                app:loadImage="@{info.virtualAppId}" />
 
             <TextView
                 android:id="@+id/launcher_app_label"
@@ -41,9 +50,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:ellipsize="end"
+                android:gravity="center_horizontal|top"
                 android:maxLines="1"
                 android:paddingTop="@dimen/label_padding_top"
-                android:gravity="center_horizontal|top"
                 android:text="@{info.appLabel}"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/launcher_app_label_text_size" />
@@ -54,12 +63,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/item_layout"
-            android:layout_toRightOf="@+id/item_layout"
             android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/item_layout"
             android:clickable="true"
-            android:visibility="gone"
+            android:src="@mipmap/remove"
+            android:visibility="gone" />
 
-            android:src="@mipmap/remove"/>
+        <ImageView
+            android:id="@+id/app_info_install"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/item_layout"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/item_layout"
+            android:clickable="true"
+            android:src="@mipmap/install"
+            android:visibility="gone" />
 
     </RelativeLayout>
 </layout>

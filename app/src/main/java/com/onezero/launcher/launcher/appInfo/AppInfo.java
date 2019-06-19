@@ -5,7 +5,6 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.onezero.launcher.launcher.BR;
 
@@ -15,13 +14,16 @@ import com.onezero.launcher.launcher.BR;
 
 public class AppInfo extends BaseObservable implements Comparable<AppInfo> {
     private String appLabel;    //应用程序标签
-    private Drawable appIconId ;  //应用程序图像
-    private Intent intent ;     //启动应用程序的Intent ，一般是Action为Main和Category为Lancher的Activity
-    private String pkgName ;    //应用程序所对应的包名
+    private Drawable appIconId;  //应用程序图像
+    private Intent intent;     //启动应用程序的Intent ，一般是Action为Main和Category为Lancher的Activity
+    private String pkgName;    //应用程序所对应的包名
     private boolean isSystemApp;
     private boolean removeable;
     private boolean isVisiable;
     private Integer position;
+    private boolean isVirtuallApp; //是否是虚拟图标
+    private String virtualAppId; //是否是虚拟图标
+    private String downloadPath; //ftp上的路径
 
     public int getPosition() {
         return position;
@@ -41,6 +43,30 @@ public class AppInfo extends BaseObservable implements Comparable<AppInfo> {
         notifyPropertyChanged(BR.appLabel);
     }
 
+    public String getDownloadPath() {
+        return downloadPath;
+    }
+
+    public void setDownloadPath(String downloadPath) {
+        this.downloadPath = downloadPath;
+    }
+
+    public String getVirtualAppId() {
+        return virtualAppId;
+    }
+
+    public void setVirtualAppId(String virtualAppId) {
+        this.virtualAppId = virtualAppId;
+    }
+
+    @Bindable
+    public boolean isVirtuallApp() {
+        return isVirtuallApp;
+    }
+
+    public void setVirtuallApp(boolean virtuallApp) {
+        isVirtuallApp = virtuallApp;
+    }
 
     public Intent getIntent() {
         return intent;
@@ -117,7 +143,7 @@ public class AppInfo extends BaseObservable implements Comparable<AppInfo> {
         this.isVisiable = isVisiable;
     }
 
-    public AppInfo(boolean isVisiable, boolean removeable, String pkgName,int position) {
+    public AppInfo(boolean isVisiable, boolean removeable, String pkgName, int position) {
         this.isVisiable = isVisiable;
         this.removeable = removeable;
         this.position = position;

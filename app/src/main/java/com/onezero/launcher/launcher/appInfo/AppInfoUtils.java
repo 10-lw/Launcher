@@ -1,6 +1,7 @@
 package com.onezero.launcher.launcher.appInfo;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -8,7 +9,9 @@ import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.util.Log;
 
+import com.onezero.launcher.launcher.callback.LoadFinishCallback;
 import com.onezero.launcher.launcher.callback.QueryCallBack;
+import com.onezero.launcher.launcher.http.AppListHelper;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
 import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -17,6 +20,7 @@ import com.raizlabs.android.dbflow.sql.language.Where;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -35,14 +39,72 @@ public class AppInfoUtils {
     private static List<AppInfo> appInfos;
 
     @SuppressLint("CheckResult")
-    public static void queryAllAppInfoTask(final PackageManager pm, final List<String> excludeList, final QueryCallBack callBack) {
+    public static void queryAllAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hideCounts, final QueryCallBack callBack) {
         Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
             public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
-                List<AppInfo> list = queryAllAppInfo(pm, excludeList);
+                ArrayList<String> pkgs = new ArrayList<>();
+                List<AppInfo> list = queryAllAppInfo(pm, excludeList, hideCounts);
+                for (int i = 0; i < list.size(); i++) {
+                    pkgs.add(list.get(i).getPkgName());
+                }
 
+                List<AppInfo> virtualList = AppListHelper.getInstance().getAppInfoList(context);
+                Iterator<AppInfo> iterator = virtualList.iterator();
+                while (iterator.hasNext()) {
+                    AppInfo next = iterator.next();
+                    if (pkgs.contains(next.getPkgName())) {
+                        iterator.remove();
+                    }
+                }
+
+                list.addAll(list.size(), virtualList);
                 if (list != null) {
                     emitter.onNext(list);
+                } else {
+                    emitter.onNext(new ArrayList<AppInfo>());
+                }
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<AppInfo>>() {
+                    @Override
+                    public void accept(List<AppInfo> list) throws Exception {
+                        callBack.querySuccessful(list);
+                    }
+                });
+    }
+
+
+    /**
+     * 查询虚拟图标应用，排除已安装的应用
+     * @param context
+     * @param pm
+     * @param excludeList
+     * @param callBack
+     */
+    @SuppressLint("CheckResult")
+    public static void queryVirsualAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hid, final QueryCallBack callBack) {
+        Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
+                ArrayList<String> pkgs = new ArrayList<>();
+                List<AppInfo> list = queryAllAppInfo(pm, excludeList, hid);
+                for (AppInfo info : list ) {
+                    pkgs.add(info.getPkgName());
+                }
+
+                List<AppInfo> virtualList = AppListHelper.getInstance().getAppInfoList(context);
+                Iterator<AppInfo> iterator = virtualList.iterator();
+                while (iterator.hasNext()) {
+                    AppInfo next = iterator.next();
+                    if (pkgs.contains(next.getPkgName())) {
+                        iterator.remove();
+                    }
+                }
+
+                if (virtualList != null) {
+                    emitter.onNext(virtualList);
                 } else {
                     emitter.onNext(new ArrayList<AppInfo>());
                 }
@@ -104,7 +166,7 @@ public class AppInfoUtils {
         return bottomAppInfos;
     }
 
-    public synchronized static List<AppInfo> queryAllAppInfo(PackageManager pm, List<String> excludeList) {
+    public synchronized static List<AppInfo> queryAllAppInfo(PackageManager pm, List<String> excludeList, int hideCounts) {
         if (appInfos == null) {
             appInfos = new ArrayList<>();
         }
@@ -134,12 +196,13 @@ public class AppInfoUtils {
             appInfo.setVisiable(true);
             appInfo.setRemoveable(false);
 
-            Where<LauncherItemModel> where = new Select(LauncherItemModel_Table.position).from(LauncherItemModel.class).where(LauncherItemModel_Table.apkPkg.eq(packageName));
+            Where<LauncherItemModel> where = new Select().from(LauncherItemModel.class).where(LauncherItemModel_Table.apkPkg.eq(packageName));
             LauncherItemModel model = where.querySingle();
             if (model != null) {
                 appInfo.setPosition(model.position);
             } else {
-                appInfo.setPosition(resolveInfoList.size());
+                int size = appInfos.size();
+                appInfo.setPosition(size+ hideCounts);
             }
 
             try {
@@ -180,9 +243,7 @@ public class AppInfoUtils {
 
     public static void getDefaultDataList(List<AppInfo> appDataList, int hideCounts) {
         for (int i = 0; i < hideCounts; i++) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                appDataList.add(new AppInfo(false, false,"nullPkg "+i, i));
-            }
+            appDataList.add(new AppInfo(false, false,"nullPkg "+i, i));
         }
     }
 }

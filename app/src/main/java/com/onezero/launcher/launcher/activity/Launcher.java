@@ -3,6 +3,7 @@ package com.onezero.launcher.launcher.activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.onezero.launcher.launcher.DateReceiver;
@@ -23,6 +25,7 @@ import com.onezero.launcher.launcher.appInfo.AppChangeReceiver;
 import com.onezero.launcher.launcher.appInfo.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
+import com.onezero.launcher.launcher.callback.QueryCallBack;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.event.PackageChangedEvent;
@@ -38,12 +41,16 @@ import com.onezero.launcher.launcher.view.IAppContentView;
 import com.onezero.launcher.launcher.view.ITimeView;
 import com.onezero.launcher.launcher.view.PageIndicatorView;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.raizlabs.android.dbflow.sql.language.Select;
+import com.raizlabs.android.dbflow.sql.language.Where;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class Launcher extends AppCompatActivity implements ITimeView, IAppContentView, PageRecyclerView.OnPagingListener, PageRecyclerView.OnTouchActionUpListener {
@@ -90,7 +97,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     private void loadData() {
         appDataList.clear();
         AppInfoUtils.getDefaultDataList(appDataList, hideCounts);
-        presenter.setAppContentView(getPackageManager(), excludeAppsConfigs);
+        presenter.setAppContentView(getApplicationContext(), getPackageManager(), excludeAppsConfigs, hideCounts);
         presenter.setBottomContentView(getPackageManager(), bottomAppsConfigs);
     }
 
@@ -204,10 +211,10 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     public void layoutAllAppsContent(final List<AppInfo> list) {
         Log.d("tag", "=======layoutAllAppsContent=========="+list.size());
         appDataList.addAll(hideCounts, list);
-        calculateIndicators(appDataList);
         DisableScrollGridManager manager = new DisableScrollGridManager(Launcher.this);
         appContent.setLayoutManager(manager);
         Collections.sort(appDataList);
+        calculateIndicators(appDataList);
         appsContentAdapter = new AllAppsPageAdapter(this, fullPageRows, columns, appDataList, hideCounts);
         appContent.setAdapter(appsContentAdapter);
         appContent.gotoPage(currentPage);
@@ -262,13 +269,26 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         if (event.isNewAdd()) {
             AppInfo info = AppInfoUtils.getAppInfoByPkgName(getPackageManager(), event.getPkgName());
 
+            Where<LauncherItemModel> where = new Select()
+                    .from(LauncherItemModel.class)
+                    .where(LauncherItemModel_Table.apkPkg.eq(event.getPkgName()));
+            LauncherItemModel q = where.querySingle();
+            Log.d(TAG, "onPackageChanged: ==="+q.appLabel + " "+q.position);
+
             LauncherItemModel model = new LauncherItemModel();
-            model.position = appDataList.size();
+            model.position = q == null ? appDataList.size() : q.position;
             model.apkPkg = info.getPkgName();
             model.appLabel = info.getAppLabel();
             model.save();
 
-            appDataList.add(appDataList.size(), info);
+            appDataList.add(model.position, info);
+            Iterator<AppInfo> iterator = appDataList.iterator();
+            while (iterator.hasNext()) {
+                AppInfo next = iterator.next();
+                if (next.getPkgName().equals(event.getPkgName()) && next.isVirtuallApp()) {
+                    iterator.remove();
+                }
+            }
         }
         if (!event.isNewAdd()) {
             AppInfo info = null;

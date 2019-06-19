@@ -18,6 +18,7 @@ import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
 import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
 import com.onezero.launcher.launcher.pageRecyclerView.PageRecyclerView;
+import com.onezero.launcher.launcher.utils.ArmBkUtils;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.greenrobot.eventbus.EventBus;
@@ -91,6 +92,9 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
                         resetState();
                         enterRemoveMode = false;
                     }
+                    if (appInfo.isVirtuallApp()) {
+                        return;
+                    }
                     ApplicationHelper.performStartApp(mContext, appInfo);
                     EventBus.getDefault().post(new OnAppItemClickEvent(appInfo));
                 }
@@ -100,7 +104,7 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
                 @Override
                 public boolean onLongClick(View view) {
 
-                    if (isSystemApp) {
+                    if (isSystemApp || appInfo.isVirtuallApp()) {
 //                        ToastUtils.showToast(mContext, R.string.can_not_remove_system_app);
                         return true;
                     }
@@ -118,6 +122,18 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
                     EventBus.getDefault().post(new OnAppItemRemoveClickEvent(appInfo));
                     longClickItem.removeIcon.setVisibility(View.GONE);
                     notifyItemChanged(position);
+                }
+            });
+
+            if (appInfo.isVirtuallApp()) {
+                holder.installIcon.setVisibility(View.VISIBLE);
+            }
+
+            holder.installIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    appInfo.setAppLabel("正在安装...");
+                    ArmBkUtils.installApk(mContext, "/app/"+appInfo.getDownloadPath(), appInfo.getPkgName(),12, "");
                 }
             });
     }

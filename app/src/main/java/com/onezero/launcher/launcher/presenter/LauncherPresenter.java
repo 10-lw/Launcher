@@ -1,5 +1,6 @@
 package com.onezero.launcher.launcher.presenter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -50,8 +51,8 @@ public class LauncherPresenter implements ITimePresenter, IAppManagerPresenter {
     }
 
     @Override
-    public void setAppContentView(PackageManager pm, List<String> excludeList) {
-        AppInfoUtils.queryAllAppInfoTask(pm, excludeList, new QueryCallBack() {
+    public void setAppContentView(Context context, PackageManager pm, List<String> excludeList, int hideCounts) {
+        AppInfoUtils.queryAllAppInfoTask(context, pm, excludeList, hideCounts, new QueryCallBack() {
             @Override
             public void querySuccessful(List<AppInfo> list) {
                 appView.layoutAllAppsContent(list);
