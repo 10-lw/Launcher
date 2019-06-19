@@ -172,3 +172,6 @@ public <methods>;
 -keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
     <init>(java.lang.Throwable);
 }
+
+#picasso
+-dontwarn com.squareup.okhttp.**
