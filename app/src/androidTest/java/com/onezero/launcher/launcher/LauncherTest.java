@@ -5,14 +5,12 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 
 import com.onezero.launcher.launcher.activity.UnitTestActivity;
-import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
 import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
 import com.onezero.launcher.launcher.utils.DeviceConfig;
-import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.sql.language.Where;
 
 import org.junit.Test;
 

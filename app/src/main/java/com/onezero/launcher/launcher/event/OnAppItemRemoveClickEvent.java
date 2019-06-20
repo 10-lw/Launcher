@@ -1,6 +1,6 @@
 package com.onezero.launcher.launcher.event;
 
-import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.model.AppInfo;
 
 public class OnAppItemRemoveClickEvent {
     private AppInfo info;

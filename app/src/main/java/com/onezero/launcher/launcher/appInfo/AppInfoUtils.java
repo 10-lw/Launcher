@@ -6,15 +6,13 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Build;
 import android.util.Log;
 
-import com.onezero.launcher.launcher.callback.LoadFinishCallback;
 import com.onezero.launcher.launcher.callback.QueryCallBack;
 import com.onezero.launcher.launcher.http.AppListHelper;
+import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
 import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.sql.language.Where;
 
@@ -40,32 +38,34 @@ public class AppInfoUtils {
 
     @SuppressLint("CheckResult")
     public static void queryAllAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hideCounts, final QueryCallBack callBack) {
-        Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
-                ArrayList<String> pkgs = new ArrayList<>();
-                List<AppInfo> list = queryAllAppInfo(pm, excludeList, hideCounts);
-                for (int i = 0; i < list.size(); i++) {
-                    pkgs.add(list.get(i).getPkgName());
-                }
+        Observable
+                .create(new ObservableOnSubscribe<List<AppInfo>>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
+                        ArrayList<String> pkgs = new ArrayList<>();
+                        List<AppInfo> list = queryAllAppInfo(pm, excludeList, hideCounts);
+                        for (int i = 0; i < list.size(); i++) {
+                            pkgs.add(list.get(i).getPkgName());
+                        }
 
-                List<AppInfo> virtualList = AppListHelper.getInstance().getAppInfoList(context);
-                Iterator<AppInfo> iterator = virtualList.iterator();
-                while (iterator.hasNext()) {
-                    AppInfo next = iterator.next();
-                    if (pkgs.contains(next.getPkgName())) {
-                        iterator.remove();
+                        List<AppInfo> virtualList = AppListHelper.getInstance().getAppInfoList(context);
+                        Iterator<AppInfo> iterator = virtualList.iterator();
+                        while (iterator.hasNext()) {
+                            AppInfo next = iterator.next();
+                            if (pkgs.contains(next.getPkgName())) {
+                                iterator.remove();
+                            }
+                        }
+
+                        list.addAll(list.size(), virtualList);
+                        if (list != null) {
+                            emitter.onNext(list);
+                        } else {
+                            emitter.onNext(new ArrayList<AppInfo>());
+                        }
                     }
-                }
-
-                list.addAll(list.size(), virtualList);
-                if (list != null) {
-                    emitter.onNext(list);
-                } else {
-                    emitter.onNext(new ArrayList<AppInfo>());
-                }
-            }
-        }).subscribeOn(Schedulers.newThread())
+                })
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<AppInfo>>() {
                     @Override
@@ -78,6 +78,7 @@ public class AppInfoUtils {
 
     /**
      * 查询虚拟图标应用，排除已安装的应用
+     *
      * @param context
      * @param pm
      * @param excludeList
@@ -90,7 +91,7 @@ public class AppInfoUtils {
             public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
                 ArrayList<String> pkgs = new ArrayList<>();
                 List<AppInfo> list = queryAllAppInfo(pm, excludeList, hid);
-                for (AppInfo info : list ) {
+                for (AppInfo info : list) {
                     pkgs.add(info.getPkgName());
                 }
 
@@ -202,7 +203,7 @@ public class AppInfoUtils {
                 appInfo.setPosition(model.position);
             } else {
                 int size = appInfos.size();
-                appInfo.setPosition(size+ hideCounts);
+                appInfo.setPosition(size + hideCounts);
             }
 
             try {
@@ -243,7 +244,7 @@ public class AppInfoUtils {
 
     public static void getDefaultDataList(List<AppInfo> appDataList, int hideCounts) {
         for (int i = 0; i < hideCounts; i++) {
-            appDataList.add(new AppInfo(false, false,"nullPkg "+i, i));
+            appDataList.add(new AppInfo(false, false, "nullPkg " + i, i));
         }
     }
 }

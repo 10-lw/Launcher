@@ -2,8 +2,6 @@ package com.onezero.launcher.launcher.activity;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,7 +11,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.onezero.launcher.launcher.DateReceiver;
@@ -22,10 +19,9 @@ import com.onezero.launcher.launcher.adapter.AllAppsPageAdapter;
 import com.onezero.launcher.launcher.adapter.BottomRecyclerViewAdapter;
 import com.onezero.launcher.launcher.adapter.SimpleItemTouchHelperCallback;
 import com.onezero.launcher.launcher.appInfo.AppChangeReceiver;
-import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
-import com.onezero.launcher.launcher.callback.QueryCallBack;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.event.PackageChangedEvent;
@@ -43,7 +39,6 @@ import com.onezero.launcher.launcher.view.PageIndicatorView;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.sql.language.Where;
-import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

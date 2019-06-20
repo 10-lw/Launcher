@@ -1,20 +1,16 @@
 package com.onezero.launcher.launcher.presenter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.support.v4.app.Fragment;
 
-import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.callback.QueryCallBack;
 import com.onezero.launcher.launcher.model.TimeModel;
 import com.onezero.launcher.launcher.view.IAppContentView;
 import com.onezero.launcher.launcher.view.ITimeView;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**

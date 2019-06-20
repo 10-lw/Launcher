@@ -1,4 +1,4 @@
-package com.onezero.launcher.launcher.appInfo;
+package com.onezero.launcher.launcher.model;
 
 import android.content.Intent;
 import android.databinding.BaseObservable;

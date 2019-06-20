@@ -3,23 +3,20 @@ package com.onezero.launcher.launcher.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.databinding.library.baseAdapters.BR;
 import com.onezero.launcher.launcher.R;
-import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
 import com.onezero.launcher.launcher.databinding.AppInfoItemBinding;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
-import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
 import com.onezero.launcher.launcher.pageRecyclerView.PageRecyclerView;
 import com.onezero.launcher.launcher.utils.ArmBkUtils;
-import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.greenrobot.eventbus.EventBus;
 

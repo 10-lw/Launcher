@@ -12,7 +12,7 @@ import android.content.pm.ResolveInfo;
 import android.util.Log;
 
 import com.onezero.launcher.launcher.R;
-import com.onezero.launcher.launcher.utils.ToastUtils;
+import com.onezero.launcher.launcher.model.AppInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;

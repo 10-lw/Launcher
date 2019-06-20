@@ -1,6 +1,6 @@
 package com.onezero.launcher.launcher.view;
 
-import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.model.AppInfo;
 
 import java.util.List;
 

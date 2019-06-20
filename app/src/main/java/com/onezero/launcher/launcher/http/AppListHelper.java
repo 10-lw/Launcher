@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.onezero.launcher.launcher.api.PostResult;
-import com.onezero.launcher.launcher.appInfo.AppInfo;
+import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
 import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
 import com.onezero.launcher.launcher.model.PreAppInfo;
@@ -50,7 +50,7 @@ public class AppListHelper {
                 return list;
             }
             String str = "{\"status\":" + String.valueOf(postResult.isStatus()) + ",\"message\":" + postResult.getMessage() + "}";
-//            Log.d("tag", "getAppInfoList: str:" + str);
+//            Log.w("tag", "?????getAppInfoList: 2222 str:" + str);
 
             Gson gson = new Gson();
             PreAppInfo preAppinfo = gson.fromJson(str, PreAppInfo.class);
