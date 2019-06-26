@@ -13,6 +13,7 @@ import com.onezero.launcher.launcher.http.AppListHelper;
 import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
 import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
+import com.onezero.launcher.launcher.utils.NetWorkUtils;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.sql.language.Where;
 

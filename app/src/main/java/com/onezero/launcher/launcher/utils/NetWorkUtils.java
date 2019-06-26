@@ -148,7 +148,7 @@ public class NetWorkUtils {
 
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
+            if (networkInfo.isConnected() && networkInfo.isConnected()) {
                 return true;
             }
         }

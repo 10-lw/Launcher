@@ -268,8 +268,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
                     .from(LauncherItemModel.class)
                     .where(LauncherItemModel_Table.apkPkg.eq(event.getPkgName()));
             LauncherItemModel q = where.querySingle();
-            Log.d(TAG, "onPackageChanged: ==="+q.appLabel + " "+q.position);
-
             LauncherItemModel model = new LauncherItemModel();
             model.position = q == null ? appDataList.size() : q.position;
             model.apkPkg = info.getPkgName();
