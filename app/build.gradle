@@ -105,4 +105,5 @@ dependencies {
     implementation "com.github.Raizlabs.DBFlow:dbflow-core:$dbflow_version"
     implementation "com.github.Raizlabs.DBFlow:dbflow:$dbflow_version"
     implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
 }

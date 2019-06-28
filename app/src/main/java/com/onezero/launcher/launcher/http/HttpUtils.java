@@ -8,6 +8,14 @@ import com.onezero.launcher.launcher.utils.NetWorkUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 
 import okhttp3.Cache;
 import okhttp3.Interceptor;
@@ -22,6 +30,7 @@ public class HttpUtils {
     private static final String URL_BASE = "http://www.yunarm.com/api/ysj/";
     private static final int NET_MAX = 30; //30秒  有网超时时间
     private static final int NO_NET_MAX = 60 * 60 * 24 * 7; //7天 无网超时时间
+    private static OkHttpClient sOkHttpClient;
 
 
     public static Retrofit getRetrofit(String url, final Context context) {
@@ -91,6 +100,55 @@ public class HttpUtils {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
         return retrofit;
+    }
+
+    /**
+     * 创建全局OkHttpClient对象
+     * <p>
+     * OkHttpClient 用于管理所有的请求，内部支持并发，
+     * 所以我们不必每次请求都创建一个 OkHttpClient 对象，这是非常耗费资源的。接下来就是创建一个 Request 对象了
+     *
+     * @return
+     */
+    public static OkHttpClient getSOkHttpClient() {
+        //创建okhttp的请求对象 参考地址  http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0106/2275.html
+
+        if (sOkHttpClient == null) {
+
+            sOkHttpClient = new OkHttpClient.Builder()
+                    .readTimeout(20000, TimeUnit.SECONDS)//设置读取超时时间
+                    .writeTimeout(20000, TimeUnit.SECONDS)//设置写的超时时间
+                    .connectTimeout(20000, TimeUnit.SECONDS)//设置连接超时时间
+                    .sslSocketFactory(createSSLSocketFactory())    //添加信任所有证书
+                    .hostnameVerifier(new HostnameVerifier() {     //信任规则全部信任
+                        @Override
+                        public boolean verify(String hostname, SSLSession session) {
+                            return true;
+                        }
+                    })
+                    .build();
+        }
+        return sOkHttpClient;
+    }
+
+    /**
+     * 测试环境https添加全部信任
+     * okhttp的配置
+     *
+     * @return
+     */
+    private static SSLSocketFactory createSSLSocketFactory() {
+        SSLSocketFactory ssfFactory = null;
+
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{new TrustAllCerts()}, new SecureRandom());
+
+            ssfFactory = sc.getSocketFactory();
+        } catch (Exception e) {
+        }
+
+        return ssfFactory;
     }
 
     public static GetAppTypeListService createAppInfoListService(Context context) {
