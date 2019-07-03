@@ -253,7 +253,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Override
     public void notifyItemLabel(String pkg) {
         if (appsContentAdapter != null) {
-            Log.d(TAG, "notifyItemLabel: ====notifyItemLabel=====pkg: "+pkg);
+            ToastUtils.showToast(this, "安装应用出错:"+pkg);
             appsContentAdapter.notifyLabel(pkg);
         }
     }
