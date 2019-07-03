@@ -12,4 +12,6 @@ public class ApplicationConstant {
     public static final String VERSION_CODE  = "versionCode";
     public static final String SEARCH = "search";
     public static final String DOWN_PATH = "downPath";
+    public static final String DOWNLOAD_ACTION = "com.arm.file.download.finish.action";
+    public static final String INSTALL_APP_ERROR_ACTION = "com.arm.INSTALL_APP_ERROR";
 }

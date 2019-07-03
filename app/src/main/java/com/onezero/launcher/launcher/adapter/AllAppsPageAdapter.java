@@ -3,6 +3,7 @@ package com.onezero.launcher.launcher.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +21,17 @@ import com.onezero.launcher.launcher.utils.ArmBkUtils;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoViewHolder> implements ItemTouchHelperAdapter {
+    private final Set<String> pkgs;
+    private final HashMap<String, AppInfo> installItems;
     private Context mContext;
     private int fullPageRows;
     private int columns;
@@ -45,6 +53,9 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
         this.columns = columns;
         this.list = list;
         this.hideCounts = hideCounts;
+        pkgs = new HashSet<>();
+        installItems = new HashMap<>();
+
     }
 
     public void setDataList(List<AppInfo> list) {
@@ -129,10 +140,33 @@ public class AllAppsPageAdapter extends PageRecyclerView.PageAdapter<AppInfoView
             holder.installIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    installItems.put(appInfo.getPkgName(), appInfo);
+                    pkgs.add(appInfo.getPkgName());
                     appInfo.setAppLabel("正在安装...");
-                    ArmBkUtils.installApk(mContext, "/app/"+appInfo.getDownloadPath(), appInfo.getPkgName(),12, "");
+                    Log.d("", "onClick: tag====::::"+appInfo.getPkgName());
+                    ArmBkUtils.installApk(mContext, "/app/"+appInfo.getDownloadPath(), appInfo.getPkgName(),11111, "");
                 }
             });
+    }
+
+    public void notifyLabel(String pkg) {
+        if (!pkgs.contains(pkg)) {
+            return;
+        }
+        Iterator<String> iterator = pkgs.iterator();
+        Log.d("tag", "notifyLabel: ==222===="+pkg);
+
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            for (int i = 0; i < list.size(); i++) {
+                AppInfo appInfo = list.get(i);
+                if (next.equals(appInfo.getPkgName())) {
+                    appInfo.setAppLabel("安装出错");
+                    iterator.remove();
+                }
+            }
+        }
+
     }
 
     private void saveToDb(AppInfo appInfo, int position) {

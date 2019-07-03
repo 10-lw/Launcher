@@ -19,6 +19,7 @@ import com.onezero.launcher.launcher.adapter.AllAppsPageAdapter;
 import com.onezero.launcher.launcher.adapter.BottomRecyclerViewAdapter;
 import com.onezero.launcher.launcher.adapter.SimpleItemTouchHelperCallback;
 import com.onezero.launcher.launcher.appInfo.AppChangeReceiver;
+import com.onezero.launcher.launcher.http.ApplicationConstant;
 import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
@@ -177,6 +178,8 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
             dateChangeFilter = new IntentFilter();
             dateChangeFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
             dateChangeFilter.addAction(Intent.ACTION_DATE_CHANGED);
+            dateChangeFilter.addAction(ApplicationConstant.DOWNLOAD_ACTION);
+            dateChangeFilter.addAction(ApplicationConstant.INSTALL_APP_ERROR_ACTION);
         }
 
         if (appChangeReceiver == null) {
@@ -245,6 +248,14 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         BottomRecyclerViewAdapter bottomRecyclerViewAdapter = new BottomRecyclerViewAdapter(this, list);
         bottomAppContent.setAdapter(bottomRecyclerViewAdapter);
         bottomAppContent.setLayoutManager(new GridLayoutManager(this, list.size()));
+    }
+
+    @Override
+    public void notifyItemLabel(String pkg) {
+        if (appsContentAdapter != null) {
+            Log.d(TAG, "notifyItemLabel: ====notifyItemLabel=====pkg: "+pkg);
+            appsContentAdapter.notifyLabel(pkg);
+        }
     }
 
 

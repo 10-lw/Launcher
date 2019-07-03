@@ -154,4 +154,21 @@ public class AppInfo extends BaseObservable implements Comparable<AppInfo> {
     public int compareTo(@NonNull AppInfo info) {
         return this.position.compareTo(info.getPosition());
     }
+
+    @Override
+    public String toString() {
+        return "AppInfo{" +
+                "appLabel='" + appLabel + '\'' +
+                ", appIconId=" + appIconId +
+                ", intent=" + intent +
+                ", pkgName='" + pkgName + '\'' +
+                ", isSystemApp=" + isSystemApp +
+                ", removeable=" + removeable +
+                ", isVisiable=" + isVisiable +
+                ", position=" + position +
+                ", isVirtuallApp=" + isVirtuallApp +
+                ", virtualAppId='" + virtualAppId + '\'' +
+                ", downloadPath='" + downloadPath + '\'' +
+                '}';
+    }
 }

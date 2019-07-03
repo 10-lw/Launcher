@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.onezero.launcher.launcher.http.ApplicationConstant;
 import com.onezero.launcher.launcher.presenter.LauncherPresenter;
 
 /**
@@ -23,6 +24,15 @@ public class DateReceiver extends BroadcastReceiver {
         String  action = intent.getAction();
         if (action.equals(Intent.ACTION_DATE_CHANGED) || action.equals(Intent.ACTION_TIMEZONE_CHANGED)) {
             presenter.updateTime();
+        } else if(ApplicationConstant.DOWNLOAD_ACTION.equals(action)) {
+            boolean status = intent.getBooleanExtra("status", false);
+            String pkgName = intent.getStringExtra("pkgName");
+            if (!status) {
+                presenter.notifyItemLabel(pkgName);
+            }
+        } else if(ApplicationConstant.INSTALL_APP_ERROR_ACTION.equals(action)) {
+            String pkgName = intent.getStringExtra("pkgName");
+            presenter.notifyItemLabel(pkgName);
         }
     }
 }

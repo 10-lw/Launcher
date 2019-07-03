@@ -65,4 +65,9 @@ public class LauncherPresenter implements ITimePresenter, IAppManagerPresenter {
             }
         });
     }
+
+    @Override
+    public void notifyItemLabel(String pkg) {
+        appView.notifyItemLabel(pkg);
+    }
 }
