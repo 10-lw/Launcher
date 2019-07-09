@@ -48,10 +48,21 @@ public class LauncherPresenter implements ITimePresenter, IAppManagerPresenter {
 
     @Override
     public void setAppContentView(Context context, PackageManager pm, List<String> excludeList, int hideCounts) {
+        AppInfoUtils.clearData();
         AppInfoUtils.queryAllAppInfoTask(context, pm, excludeList, hideCounts, new QueryCallBack() {
             @Override
             public void querySuccessful(List<AppInfo> list) {
                 appView.layoutAllAppsContent(list);
+            }
+        });
+    }
+
+    @Override
+    public void setVirtualApp(Context context, PackageManager pm, List<String> excludeList, int hideCounts) {
+        AppInfoUtils.queryVirtualAppInfoTask(context, pm, excludeList, hideCounts, new QueryCallBack() {
+            @Override
+            public void querySuccessful(List<AppInfo> list) {
+                appView.layoutVirtualApps(list);
             }
         });
     }

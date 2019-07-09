@@ -46,7 +46,7 @@ public class AppListHelper {
         try {
             Response<PostResult> response = resultCall.execute();
             PostResult postResult = response.body();
-            if (!postResult.isStatus()) {
+            if (postResult == null || !postResult.isStatus()) {
                 return list;
             }
             String str = "{\"status\":" + String.valueOf(postResult.isStatus()) + ",\"message\":" + postResult.getMessage() + "}";

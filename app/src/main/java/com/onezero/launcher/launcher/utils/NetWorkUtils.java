@@ -9,6 +9,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 
@@ -133,6 +134,21 @@ public class NetWorkUtils {
         }
         return type;
     }
+
+    public static int pingNet() {
+        int status = -1;
+        try {
+            Process process = Runtime.getRuntime().exec("/system/bin/ping -c 2 -w 100 114.114.114.114");//ping网址3次
+            status = process.waitFor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return status;
+    }
+
+
 
     /***
      * check network is enable

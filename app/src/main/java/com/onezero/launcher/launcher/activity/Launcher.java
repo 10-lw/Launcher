@@ -1,5 +1,6 @@
 package com.onezero.launcher.launcher.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import com.onezero.launcher.launcher.view.PageIndicatorView;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.sql.language.Select;
 import com.raizlabs.android.dbflow.sql.language.Where;
+import com.william.androidsdk.widget.armdialog.manager.DialogUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -91,6 +93,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     }
 
     private void loadData() {
+        DialogUtil.createLoadingDialog(this,"正在加载...");
         appDataList.clear();
         AppInfoUtils.getDefaultDataList(appDataList, hideCounts);
         presenter.setAppContentView(getApplicationContext(), getPackageManager(), excludeAppsConfigs, hideCounts);
@@ -207,7 +210,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
      */
     @Override
     public void layoutAllAppsContent(final List<AppInfo> list) {
-        Log.d("tag", "=======layoutAllAppsContent=========="+list.size());
         appDataList.addAll(hideCounts, list);
         DisableScrollGridManager manager = new DisableScrollGridManager(Launcher.this);
         appContent.setLayoutManager(manager);
@@ -224,6 +226,20 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         touchHelper = new ItemTouchHelper(helperCallback);
         //调用ItemTouchHelper的attachToRecyclerView方法建立联系
         touchHelper.attachToRecyclerView(appContent);
+        presenter.setVirtualApp(getApplicationContext(), getPackageManager(), excludeAppsConfigs, hideCounts);
+    }
+
+    @Override
+    public void layoutVirtualApps(List<AppInfo> list) {
+        if (appsContentAdapter == null || appDataList == null || list.size() == 0) {
+            DialogUtil.closeLoadingDialog(this);
+            return;
+        }
+        appDataList.addAll(appDataList.size(), list);
+        Collections.sort(appDataList);
+        calculateIndicators(appDataList);
+        appsContentAdapter.setDataList(appDataList);
+        DialogUtil.closeLoadingDialog(this);
     }
 
     private int calculateIndicators(List<AppInfo> list) {

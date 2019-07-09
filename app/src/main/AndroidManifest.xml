@@ -27,7 +27,8 @@
             android:enabled="true"
             android:exported="true"
             android:hardwareAccelerated="false"
-            android:launchMode="standard"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
             android:screenOrientation="portrait"
             android:theme="@style/LauncherActivityTheme"
             android:windowSoftInputMode="adjustPan">

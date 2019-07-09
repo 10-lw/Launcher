@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.onezero.launcher.launcher.callback.QueryCallBack;
@@ -42,23 +43,8 @@ public class AppInfoUtils {
         Observable
                 .create(new ObservableOnSubscribe<List<AppInfo>>() {
                     @Override
-                    public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
-                        ArrayList<String> pkgs = new ArrayList<>();
+                    public void subscribe(ObservableEmitter<List<AppInfo>> emitter) {
                         List<AppInfo> list = queryAllAppInfo(pm, excludeList, hideCounts);
-                        for (int i = 0; i < list.size(); i++) {
-                            pkgs.add(list.get(i).getPkgName());
-                        }
-
-                        List<AppInfo> virtualList = AppListHelper.getInstance().getAppInfoList(context);
-                        Iterator<AppInfo> iterator = virtualList.iterator();
-                        while (iterator.hasNext()) {
-                            AppInfo next = iterator.next();
-                            if (pkgs.contains(next.getPkgName())) {
-                                iterator.remove();
-                            }
-                        }
-
-                        list.addAll(list.size(), virtualList);
                         if (list != null) {
                             emitter.onNext(list);
                         } else {
@@ -86,7 +72,12 @@ public class AppInfoUtils {
      * @param callBack
      */
     @SuppressLint("CheckResult")
-    public static void queryVirsualAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hid, final QueryCallBack callBack) {
+    public static void queryVirtualAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hid, final QueryCallBack callBack) {
+        if(NetWorkUtils.pingNet() != 0) {
+            Log.d("tag", "queryVirtualAppInfoTask:net is not ok ");
+            callBack.querySuccessful(new ArrayList<AppInfo>());
+            return;
+        }
         Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
             public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
@@ -168,11 +159,19 @@ public class AppInfoUtils {
         return bottomAppInfos;
     }
 
+    public static void clearData() {
+        if(appInfos != null) {
+            appInfos.clear();
+            appInfos = null;
+        }
+    }
+
     public synchronized static List<AppInfo> queryAllAppInfo(PackageManager pm, List<String> excludeList, int hideCounts) {
         if (appInfos == null) {
             appInfos = new ArrayList<>();
+        } else {
+            return appInfos;
         }
-        appInfos.clear();
         Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> resolveInfoList = pm.queryIntentActivities(mainIntent, 0);

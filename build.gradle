@@ -27,6 +27,14 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
+ext {
+    // Sdk and tools
+    targetSdkVersion = 27
+    compileSdkVersion = 28
+    buildToolsVersion = '26.0.0'
+    supportLibraryVersion = '26.1.0'
+}
+
 def getAppVersionCode() {
     def versionFile = file('version.properties')
     if (versionFile.canRead()) {
