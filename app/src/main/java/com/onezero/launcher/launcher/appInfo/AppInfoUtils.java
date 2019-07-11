@@ -3,14 +3,15 @@ package com.onezero.launcher.launcher.appInfo;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.SystemClock;
 import android.util.Log;
 
 import com.onezero.launcher.launcher.callback.QueryCallBack;
 import com.onezero.launcher.launcher.http.AppListHelper;
+import com.onezero.launcher.launcher.http.ApplicationConstant;
 import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
 import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
@@ -36,10 +37,15 @@ import io.reactivex.schedulers.Schedulers;
 
 public class AppInfoUtils {
 
-    private static List<AppInfo> appInfos;
+    private volatile static List<AppInfo> appInfos;
+    private volatile static List<AppInfo> bottomAppInfos;
+    private volatile static List<AppInfo> virtualList;
+    private static long INTERVAL_TIME = 10 * 60 * 1000; //10min
+    private static int mHideCounts = 0;
 
     @SuppressLint("CheckResult")
     public static void queryAllAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hideCounts, final QueryCallBack callBack) {
+        mHideCounts = hideCounts;
         Observable
                 .create(new ObservableOnSubscribe<List<AppInfo>>() {
                     @Override
@@ -73,7 +79,7 @@ public class AppInfoUtils {
      */
     @SuppressLint("CheckResult")
     public static void queryVirtualAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hid, final QueryCallBack callBack) {
-        if(NetWorkUtils.pingNet() != 0) {
+        if (NetWorkUtils.pingNet() != 0) {
             Log.d("tag", "queryVirtualAppInfoTask:net is not ok ");
             callBack.querySuccessful(new ArrayList<AppInfo>());
             return;
@@ -81,13 +87,22 @@ public class AppInfoUtils {
         Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
             public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
+                SharedPreferences sharedPreferences = context.getSharedPreferences(ApplicationConstant.SP_NAME, Context.MODE_PRIVATE);
+                long before = sharedPreferences.getLong(ApplicationConstant.SP_VIRTUAL_UPDATE_TIME, System.currentTimeMillis());
+                //指定时间内不再重新查询网络, 复用原来的数据
+                boolean isTime = System.currentTimeMillis() - before < INTERVAL_TIME;//是否需要重新查询
+                if (isTime && virtualList != null) {
+                    emitter.onNext(virtualList);
+                    return;
+                } else {
+                }
+                virtualList = AppListHelper.getInstance().getAppInfoList(context);
                 ArrayList<String> pkgs = new ArrayList<>();
                 List<AppInfo> list = queryAllAppInfo(pm, excludeList, hid);
                 for (AppInfo info : list) {
                     pkgs.add(info.getPkgName());
                 }
 
-                List<AppInfo> virtualList = AppListHelper.getInstance().getAppInfoList(context);
                 Iterator<AppInfo> iterator = virtualList.iterator();
                 while (iterator.hasNext()) {
                     AppInfo next = iterator.next();
@@ -95,7 +110,8 @@ public class AppInfoUtils {
                         iterator.remove();
                     }
                 }
-
+                SharedPreferences.Editor edit = sharedPreferences.edit();
+                edit.putLong(ApplicationConstant.SP_VIRTUAL_UPDATE_TIME, System.currentTimeMillis()).apply();
                 if (virtualList != null) {
                     emitter.onNext(virtualList);
                 } else {
@@ -136,7 +152,12 @@ public class AppInfoUtils {
     }
 
     public synchronized static List<AppInfo> queryBottomAppInfo(PackageManager pm, List<String> bottomAppsConfigs) {
-        List<AppInfo> bottomAppInfos = new ArrayList<>();
+        //复用原来的数据
+        if (bottomAppInfos == null) {
+            bottomAppInfos = new ArrayList<>();
+        } else {
+            return bottomAppInfos;
+        }
         ArrayList<String> installedPkg = new ArrayList<>();
         Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -160,13 +181,54 @@ public class AppInfoUtils {
     }
 
     public static void clearData() {
-        if(appInfos != null) {
+        if (appInfos != null) {
             appInfos.clear();
             appInfos = null;
         }
     }
 
+    //新添加数据时,直接加入集合,避免复用数据时数据错误
+    public static void addDataToLast(PackageManager pm, String packageName) {
+        if (appInfos == null) {
+            appInfos = new ArrayList<>();
+        }
+        AppInfo info = AppInfoUtils.getAppInfoByPkgName(pm, packageName);
+        Where<LauncherItemModel> where = new Select()
+                .from(LauncherItemModel.class)
+                .where(LauncherItemModel_Table.apkPkg.eq(info.getPkgName()));
+        LauncherItemModel q = where.querySingle();
+        int size = appInfos.size();
+        int vir = virtualList == null ? 0 : virtualList.size();
+        info.setPosition(q == null ? (size + mHideCounts + vir) : q.position);
+        appInfos.add(size, info);
+        deleteVirtualListItem(packageName);
+    }
+
+    //如果是安装的虚拟的应用, 这对应的需要把虚拟图标数据删除
+    private static void deleteVirtualListItem(String packageName) {
+        deleteDateFromList(virtualList, packageName);
+    }
+
+    private static void deleteDateFromList(List<AppInfo> list, String pkg) {
+        if (list == null || list.size() == 0) {
+            return;
+        }
+        Iterator<AppInfo> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            AppInfo next = iterator.next();
+            if (next.getPkgName().equals(pkg)) {
+                iterator.remove();
+            }
+        }
+    }
+
+    //卸载应用时需要将原数据集合的内容清除, 避免产生假的数据, 不再恢复虚拟应用数据, 因为每间隔 #INTERVAL_TIME 会重新查一次
+    public static void delAllAppListItem(String pkgName) {
+        deleteDateFromList(appInfos, pkgName);
+    }
+
     public synchronized static List<AppInfo> queryAllAppInfo(PackageManager pm, List<String> excludeList, int hideCounts) {
+        //复用原来的数据
         if (appInfos == null) {
             appInfos = new ArrayList<>();
         } else {

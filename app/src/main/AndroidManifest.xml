@@ -28,6 +28,8 @@
             android:exported="true"
             android:hardwareAccelerated="false"
             android:launchMode="singleTask"
+            android:stateNotNeeded="true"
+            android:clearTaskOnLaunch="true"
             android:taskAffinity=""
             android:screenOrientation="portrait"
             android:theme="@style/LauncherActivityTheme"
@@ -67,6 +69,14 @@
             android:name=".services.ClipboardHelperService"
             android:enabled="true"
             android:exported="true"></service>
+
+        <receiver android:name=".appInfo.AppChangeReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED"/>
+                <action android:name="android.intent.action.PACKAGE_REMOVED"/>
+                <data android:scheme="package"></data>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

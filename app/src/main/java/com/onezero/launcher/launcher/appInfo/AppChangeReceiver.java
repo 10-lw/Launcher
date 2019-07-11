@@ -18,8 +18,10 @@ public class AppChangeReceiver extends BroadcastReceiver {
         String packageName = intent.getData().getSchemeSpecificPart();
         Log.d("AppChangeReceiver", "====on AppChangeReceiver receive action: "+action + " packageName:"+packageName);
         if (action.equals(Intent.ACTION_PACKAGE_ADDED)) {
+            AppInfoUtils.addDataToLast(context.getPackageManager(), packageName);
             EventBus.getDefault().post(new PackageChangedEvent(packageName, true));
         } else if (action.equals(Intent.ACTION_PACKAGE_REMOVED)) {
+            AppInfoUtils.delAllAppListItem(packageName);
             EventBus.getDefault().post(new PackageChangedEvent(packageName, false));
         }
     }

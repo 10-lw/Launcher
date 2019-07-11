@@ -1,6 +1,5 @@
 package com.onezero.launcher.launcher.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -8,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,14 +17,13 @@ import com.onezero.launcher.launcher.R;
 import com.onezero.launcher.launcher.adapter.AllAppsPageAdapter;
 import com.onezero.launcher.launcher.adapter.BottomRecyclerViewAdapter;
 import com.onezero.launcher.launcher.adapter.SimpleItemTouchHelperCallback;
-import com.onezero.launcher.launcher.appInfo.AppChangeReceiver;
-import com.onezero.launcher.launcher.http.ApplicationConstant;
-import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.appInfo.AppInfoUtils;
 import com.onezero.launcher.launcher.appInfo.ApplicationHelper;
 import com.onezero.launcher.launcher.event.OnAppItemClickEvent;
 import com.onezero.launcher.launcher.event.OnAppItemRemoveClickEvent;
 import com.onezero.launcher.launcher.event.PackageChangedEvent;
+import com.onezero.launcher.launcher.http.ApplicationConstant;
+import com.onezero.launcher.launcher.model.AppInfo;
 import com.onezero.launcher.launcher.model.LauncherItemModel;
 import com.onezero.launcher.launcher.model.LauncherItemModel_Table;
 import com.onezero.launcher.launcher.pageRecyclerView.DisableScrollGridManager;
@@ -68,8 +65,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     private int fullPageRows;
     private int columns = 0;
     private List<String> bottomAppsConfigs;
-    private AppChangeReceiver appChangeReceiver;
-    private IntentFilter appChangeFilter;
     private List<AppInfo> appDataList = new ArrayList<>();
     private int firstPageRows;
     private int hideCounts;
@@ -82,11 +77,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
         //设置系统桌面为背景
-//        Drawable wallPaper = WallpaperManager.getInstance(this).getDrawable();
-//        if (wallPaper == null) {
-//            Log.d("tag", "======wallPaper == null ==============");
-//        }
-//        this.getWindow().setBackgroundDrawable(wallPaper);
         getWindow().setBackgroundDrawableResource(R.mipmap.wallpaper);
         presenter = new LauncherPresenter(this, this);
         initViews();
@@ -148,12 +138,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
             unregisterReceiver(dateReceiver);
             dateReceiver = null;
         }
-
-        if (appChangeReceiver != null) {
-            unregisterReceiver(appChangeReceiver);
-            appChangeReceiver = null;
-        }
-
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
@@ -184,19 +168,7 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
             dateChangeFilter.addAction(ApplicationConstant.DOWNLOAD_ACTION);
             dateChangeFilter.addAction(ApplicationConstant.INSTALL_APP_ERROR_ACTION);
         }
-
-        if (appChangeReceiver == null) {
-            appChangeReceiver = new AppChangeReceiver();
-        }
-
-        if (appChangeFilter == null) {
-            appChangeFilter = new IntentFilter();
-            appChangeFilter.addAction(Intent.ACTION_PACKAGE_ADDED);
-            appChangeFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-            appChangeFilter.addDataScheme("package");
-        }
         registerReceiver(dateReceiver, dateChangeFilter);
-        registerReceiver(appChangeReceiver, appChangeFilter);
 
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
@@ -278,7 +250,6 @@ public class Launcher extends AppCompatActivity implements ITimeView, IAppConten
     @Subscribe
     public void onItemClick(OnAppItemClickEvent event) {
         startApp = true;
-//        ApplicationHelper.performStartApp(this, event.getInfo());
     }
 
     @Subscribe

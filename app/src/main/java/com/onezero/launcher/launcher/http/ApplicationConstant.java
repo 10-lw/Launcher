@@ -14,4 +14,6 @@ public class ApplicationConstant {
     public static final String DOWN_PATH = "downPath";
     public static final String DOWNLOAD_ACTION = "com.arm.file.download.finish.action";
     public static final String INSTALL_APP_ERROR_ACTION = "com.arm.INSTALL_APP_ERROR";
+    public static final String SP_NAME = "launcher_sp";
+    public static final String SP_VIRTUAL_UPDATE_TIME = "updateTime";
 }
