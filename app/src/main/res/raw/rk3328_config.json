@@ -9,19 +9,18 @@
     "com.android.inputmethod.latin",
     "com.sohu.inputmethod.sogou",
     "com.sohu.inputmethod.sogouoem",
-    "com.android.email",
     "com.android.contacts",
-    "com.android.gallery3d",
-    "com.android.providers.downloads.ui",
-    "com.android.mms",
-    "com.android.soundrecorder",
+    "com.android.dialer",
+    "com.android.email",
+    "com.android.calculator2",
     "com.android.calendar",
-    "com.android.music",
     "com.android.deskclock",
-    "com.android.galaxy4",
+    "com.android.gallery3d",
     "com.android.documentsui",
-    "com.android.camera2",
+    "com.android.music",
+    "com.android.soundrecorder",
+    "com.android.speechrecorder",
     "com.android.quicksearchbox",
-    "com.android.calculator2"
+    "com.android.camera2"
   ]
 }

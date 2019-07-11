@@ -1,7 +1,7 @@
 package com.onezero.launcher.launcher.utils;
 
 import android.content.Context;
-import android.util.Log;
+import android.os.Build;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -19,19 +19,20 @@ public class DeviceConfig {
 
     public DeviceConfig(Context mContext) {
         this.mContext = mContext;
-        String config = ResourceUtil.getRawResourceString(mContext, "rk3288_config", mContext.getPackageName());
+        String fileName = Build.VERSION.SDK_INT == 22 ? "rk3288_config" : "rk3328_config";
+        String config = ResourceUtil.getRawResourceString(mContext, fileName, mContext.getPackageName());
         parse = (JSONObject) JSON.parse(config);
     }
 
     public static DeviceConfig getInstance(Context context) {
         if (configs == null) {
-            configs = new  DeviceConfig(context);
+            configs = new DeviceConfig(context);
         }
         return configs;
     }
 
     public List<String> getBottomAppsConfigs() {
-          String string = parse.getString(BOTTOM_CONFIG_APPS_PKG);
+        String string = parse.getString(BOTTOM_CONFIG_APPS_PKG);
         JSONArray jsonArray = JSON.parseArray(string);
         List<String> list = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
