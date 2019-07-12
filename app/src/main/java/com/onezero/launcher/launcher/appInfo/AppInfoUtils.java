@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.onezero.launcher.launcher.callback.QueryCallBack;
@@ -42,6 +44,9 @@ public class AppInfoUtils {
     private volatile static List<AppInfo> virtualList;
     private static long INTERVAL_TIME = 10 * 60 * 1000; //10min
     private static int mHideCounts = 0;
+    private static Handler mHandler = new Handler(Looper.getMainLooper());
+    private static int counts = 0;
+    private static Runnable runnable;
 
     @SuppressLint("CheckResult")
     public static void queryAllAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hideCounts, final QueryCallBack callBack) {
@@ -79,11 +84,6 @@ public class AppInfoUtils {
      */
     @SuppressLint("CheckResult")
     public static void queryVirtualAppInfoTask(final Context context, final PackageManager pm, final List<String> excludeList, final int hid, final QueryCallBack callBack) {
-        if (NetWorkUtils.pingNet() != 0) {
-            Log.d("tag", "queryVirtualAppInfoTask:net is not ok ");
-            callBack.querySuccessful(new ArrayList<AppInfo>());
-            return;
-        }
         Observable.create(new ObservableOnSubscribe<List<AppInfo>>() {
             @Override
             public void subscribe(ObservableEmitter<List<AppInfo>> emitter) throws Exception {
@@ -93,9 +93,24 @@ public class AppInfoUtils {
                 boolean isTime = System.currentTimeMillis() - before < INTERVAL_TIME;//是否需要重新查询
                 if (isTime && virtualList != null) {
                     emitter.onNext(virtualList);
+                    emitter.onComplete();
                     return;
-                } else {
                 }
+
+                //避免刚开机时网络还没连接
+                if (NetWorkUtils.pingNet() != 0 && counts <= 4) {
+                    counts++;
+                    runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            queryVirtualAppInfoTask(context, pm, excludeList, hid, callBack);
+                        }
+                    };
+                    mHandler.removeCallbacks(runnable);
+                    mHandler.postDelayed(runnable, 2000);
+                    return;
+                }
+
                 virtualList = AppListHelper.getInstance().getAppInfoList(context);
                 ArrayList<String> pkgs = new ArrayList<>();
                 List<AppInfo> list = queryAllAppInfo(pm, excludeList, hid);
@@ -114,8 +129,10 @@ public class AppInfoUtils {
                 edit.putLong(ApplicationConstant.SP_VIRTUAL_UPDATE_TIME, System.currentTimeMillis()).apply();
                 if (virtualList != null) {
                     emitter.onNext(virtualList);
+                    emitter.onComplete();
                 } else {
                     emitter.onNext(new ArrayList<AppInfo>());
+                    emitter.onComplete();
                 }
             }
         }).subscribeOn(Schedulers.newThread())
