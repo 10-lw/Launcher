@@ -152,6 +152,9 @@ public class AppInfo extends BaseObservable implements Comparable<AppInfo> {
 
     @Override
     public int compareTo(@NonNull AppInfo info) {
+        if (position == null || info == null) {
+            return 0;
+        }
         return this.position.compareTo(info.getPosition());
     }
 

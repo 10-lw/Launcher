@@ -37,10 +37,10 @@ public class ApplicationHelper {
     private static void startActivitySafely(Context context, AppInfo info) {
         try {
             Intent intent = info.getIntent();
+            intent.setAction(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                    | Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK 
+                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             context.startActivity(intent);
         } catch (Exception e) {
             Log.e(TAG, "start activity error,the intent is:" + info.getIntent().toString());
